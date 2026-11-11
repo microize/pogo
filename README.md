@@ -1,8 +1,41 @@
 # genie-de-skills
 
 Spec-driven data engineering skills for **Databricks Genie Code**, used **inside the Databricks workspace only**.
-The goal: reliable pipelines, and data that people and AI can understand and use, through a semantic layer
-(metric views, keys, comments, Genie Agents) and ontology / knowledge-graph design built on the data in Unity Catalog.
+
+## Objective
+
+Help data engineers, data architects and data modelers on Databricks, working only inside the workspace with Genie
+Code, deliver two things:
+
+1. **Reliable pipelines, built spec-first.** Nothing is built before an approved spec, every task is verified, a
+   fresh-eyes (goldfish) review checks the spec, guardrails keep the agent in dev, and a release gate decides on prod.
+2. **Data that people and AI can understand and use.** A semantic layer (metric views, keys, comments, Genie Agents)
+   and ontology / knowledge-graph design, built on the data in Unity Catalog.
+
+Advisory skills (technology choice, cost, environment readiness, contracts, data quality, diagnosis) support both.
+The aim is to cut day-to-day effort by **up to 80%**. That figure is a target, not a claim: every task and every
+piece of advisory work records its start and finish time from the workspace clock and a manual-effort estimate, and
+`@de-sdd-tracking productivity report` shows the saving actually reached, with rework next to it (see
+[Measuring productivity](#measuring-productivity)).
+
+## Who it is for
+
+| Role | Main skills | Typical output |
+|---|---|---|
+| Data engineer | `de-sdd-spec`, `de-sdd-implement`, `de-run-diagnose` (incl. Explain mode), `de-spark-runtime`, `de-quality-testing` | pipelines, jobs, bundles, tests, plain-language log and plan explanations, version-aware code fixes |
+| Analytics engineer / BI developer | `de-data-modeling` (semantic mode), `de-sdd-spec` | gold tables, metric views, Genie Agent setup |
+| Data architect | `de-advisor`, `de-cost`, `de-spark-runtime`, `de-env-check`, `de-data-contract`, `de-goldfish-review` | decision records, contracts, reviews |
+| Data modeler | `de-data-modeling`, `de-ontology-design` | bus matrix, star schema / Data Vault, ontology |
+| Data steward / governance lead | `de-data-governance`, `de-data-modeling` (comments, keys), `de-ontology-design` (glossary terms) | governance scorecard, tag taxonomy, classification and ABAC proposals, certification |
+| Tech lead | `de-sdd-tracking`, `de-release-gate`, `de-goldfish-review` | status, who did what, productivity report, GO / NO_GO |
+| Workspace admin | `de-env-check`, `install/install_skills` | readiness checklist, installed kit |
+| Business / product owner | answers interview questions, approves specs, owns meaning | approved spec, confirmed definitions |
+
+Entry points per role, and the roles not covered yet, are in [docs/user-guide/08-roles.md](docs/user-guide/08-roles.md).
+Which skill covers which lifecycle stage for each role: [docs/user-guide/09-skills-by-role-and-lifecycle.md](docs/user-guide/09-skills-by-role-and-lifecycle.md).
+
+## How it works
+
 Every step (install, specs, build, test, commit, deploy) is done in the workspace: Genie Code in agent mode, notebooks,
 the SQL editor, the Lakeflow Pipelines Editor, Git folders and the bundle Deployments panel. No laptop, local CLI or
 CI is needed. Each skill follows the open [Agent Skills](https://agentskills.io) standard: a folder with a `SKILL.md`
@@ -12,13 +45,13 @@ whose frontmatter has `name` and `description`.
 
 | Path | What it is |
 |---|---|
-| `skills/de-*/` | the 14 skills |
+| `skills/de-*/` | the 16 skills |
 | `install/install_skills.py` | notebook that publishes the skills to the workspace and verifies them |
 | `install/official/` | 16 official `databricks-*` skills, vendored unmodified at the pinned release, with their license |
 | `AGENTS.md` | the method's rules and routing, copied into each project folder |
 | `instructions/` | conventions, security guardrails, waivers, and paste-ready Genie Code instructions |
 | `docs/user-guide/` | the guide for engineers |
-| `docs/maintainers/` | for kit maintainers: skill trigger tests (prompts that should and should not load each skill) |
+| `docs/maintainers/` | for kit maintainers: when each skill should load and its trigger tests, and the checklist for adding a skill |
 | `backup/` | local zips of earlier versions (git-ignored, not published) |
 
 Scope: ETL / ELT, data warehouse, lakehouse (medallion), CDC and SCD pipelines on Databricks.
@@ -63,16 +96,18 @@ Any time:
 | `de-sdd-spec` | intake, discovery (greenfield / brownfield), clarifying interview, `spec.md`, approval gate, `plan.md`, `tasks.md` | write pipeline code |
 | `de-goldfish-review` | zero-context review of a spec in a fresh chat: comprehension paraphrase, hidden assumptions, Blocker / Major / Minor findings into `specs/<track_id>/review_<n>_<email>.md` | edit the spec, read chat history or ledgers |
 | `de-sdd-implement` | claiming and executing `tasks.md` one task at a time, verification per task, commits | change the spec silently, take another person's task |
-| `de-sdd-tracking` | file formats and updates for `.internal_<email>/` and `.challenges_<email>/`, status, resume, "who did what" and challenges reports across all people | implement tasks |
-| `de-advisor` | advisor mode: options, trade-offs, maturity (GA / Preview), recommendation | edit files |
+| `de-sdd-tracking` | file formats and updates for `.internal_<email>/` and `.challenges_<email>/`, status, resume, "who did what" and challenges reports across all people, start / finish times, `worklog.md`, productivity report | implement tasks, rank people |
+| `de-advisor` | advisor mode: options, trade-offs, maturity (GA / Preview), recommendation | edit project files (writes only a decision record and its own ledger rows) |
 | `de-cost` | cost and run-time per option from a dated Azure price file (refresh script: Retail Prices API + calculator feed) | quote negotiated prices |
 | `de-env-check` | workspace readiness: compute per workload, quota signals, Unity Catalog, system tables, tooling; admin checklist | change settings, grants or clusters |
 | `de-data-modeling` | bus matrix, grain, dimensions, logical and physical model, Mermaid diagram, validation queries, review | write pipeline code |
 | `de-ontology-design` | concepts, properties, relationships, vocabularies and identity proposed from Unity Catalog data, with evidence; competency-question coverage; optional OWL / LinkML text | build the knowledge graph or change data |
+| `de-data-governance` | read-only Unity Catalog governance assessment: 22 checks mapped to the CDMC 14 key controls, completeness score and maturity, classification-to-protection reconciliation, governed-tag taxonomy, ABAC and certification proposals, steward model, score history | run GRANT / SET TAGS / COMMENT / CREATE POLICY (writes a human-run apply script) |
 | `de-databricks-current` | current Databricks names (old to new), DE design patterns, pointers to the official `databricks-*` skills | replace the official product skills |
 | `de-data-contract` | versioned data contracts (`specs/contracts/*.yaml`) and change impact reports from Unity Catalog lineage | alter tables |
 | `de-quality-testing` | DQ rule table with severity, enforced as pipeline expectations plus post-load SQL; unit and pipeline tests under `tests/` | design tables, run pipelines |
-| `de-run-diagnose` | run, monitor, verify, classify failures (Spark catalog plus PIPE patterns), fix, re-run at most 3 times, escalate; performance review | touch prod |
+| `de-run-diagnose` | run, monitor, verify, classify failures (Spark catalog plus PIPE patterns), fix, re-run at most 3 times, escalate; performance review; Explain mode (logs, stack traces, cluster events, Spark UI, query profile, plans in plain language) | touch prod |
+| `de-spark-runtime` | compute choice and right-sizing from system tables (node utilization, query history, job runs, billing), warehouse sizing, runtime selection and upgrade impact, version-aware code advice from a dated Spark / DBR catalog | create, resize, start or stop compute; decide serverless vs classic (official `databricks-serverless` does) |
 | `de-release-gate` | PR merge disposition and prod readiness scorecard (GO / CONDITIONAL_GO / NO_GO) | deploy |
 
 The official Databricks skills (`databricks-pipelines`, `databricks-dabs`, `databricks-jobs`,
@@ -97,10 +132,10 @@ AUTO CDC, expectations, SCD2 querying, performance, running a pipeline), `databr
 
 ### Core method vs supporting skills
 
-The package has **14 skills**. Six are the method: `de-sdd-spec`, `de-goldfish-review`, `de-sdd-implement`,
-`de-sdd-tracking`, `de-advisor`, `de-databricks-current`. Eight support it at the right task: `de-data-contract`,
-`de-quality-testing`, `de-run-diagnose`, `de-release-gate`, `de-data-modeling`, `de-ontology-design`, `de-env-check`,
-`de-cost`. Install all 14; the install notebook installs them together with the official skills and expects `30 ok, 0 failed`.
+The package has **16 skills**. Six are the method: `de-sdd-spec`, `de-goldfish-review`, `de-sdd-implement`,
+`de-sdd-tracking`, `de-advisor`, `de-databricks-current`. Ten support it at the right task: `de-data-contract`,
+`de-quality-testing`, `de-run-diagnose`, `de-spark-runtime`, `de-release-gate`, `de-data-modeling`, `de-ontology-design`,
+`de-data-governance`, `de-env-check`, `de-cost`. Install all 16; the install notebook installs them together with the official skills and expects `32 ok, 0 failed`.
 
 ## Install (in the workspace)
 
@@ -113,7 +148,7 @@ Genie Code discovers skills in `/Users/<your-email>/.assistant/skills/` (persona
    `/Workspace/.assistant_workspace_instructions.md` from `instructions/genie-code-user-instructions.md`). Both scopes
    write a `_VERSION` stamp next to the skills. `include_official` = `yes` (default) also installs the official skills. Optional
    `dry_run` = `yes` shows what would change. Run all.
-4. The last cell prints `30 ok, 0 failed`. Start a **new** Genie Code chat in agent mode (hard-refresh the browser if
+4. The last cell prints `32 ok, 0 failed`. Start a **new** Genie Code chat in agent mode (hard-refresh the browser if
    the skills do not appear). Skills load by description, or mention them with `@de-sdd-spec`.
 
 To update: pull in the Git folder dialog, re-run the notebook.
@@ -191,14 +226,35 @@ challenges file and share only lessons. State this in each project README.
 | `.internal_<email>/index.md` | this person's track list and statuses | de-sdd-tracking |
 | `specs/<track_id>/decisions.md` | clarifying questions and the user's answers, appended per round | de-sdd-spec |
 | `specs/contracts/<table>.yaml`, `specs/<track_id>/impact_<n>.md` | data contracts and change impact reports | de-data-contract |
+| `specs/compute/<name>-sizing.md`, `<scope>-version-review.md` | compute sizing and version-aware code reviews | de-spark-runtime |
+| `specs/governance/taxonomy.md`, `history.md`, `<scope>/assessment.md`, `<scope>/apply_<n>.sql` | governance taxonomy and operating model, score history, assessments, human-run apply scripts | de-data-governance |
 | `specs/<track_id>/pr_review_<n>.md`, `release_<n>.md` | merge and prod gate reports | de-release-gate |
 | `tests/` | unit, pipeline and DQ SQL tests | de-quality-testing |
 | `.internal_<email>/` | per-person progress ledger: what is done, what is next, decisions taken while coding | de-sdd-implement through de-sdd-tracking |
 | `.challenges_<email>/` | per-person log of where the agent struggled: attempts, errors, root cause, workaround, lesson | de-sdd-implement through de-sdd-tracking |
+| `.internal_<email>/worklog.md` | per-person time log for work outside a track (advice, model, ontology, cost, diagnosis, gate): start, finish, manual estimate, outcome | every skill through de-sdd-tracking |
 
 `<email>` is the Databricks user email (`SELECT current_user()`).
 Example: `.internal_sripathi@company.com/`. Commit these folders (default) so the team has the audit trail;
 add `.internal_*/` and `.challenges_*/` to `.gitignore` only if your team decides they are personal scratch.
+
+## Measuring productivity
+
+The productivity target (for example 80%) is set per project in `specs/project-profile.md` ("Productivity"). The
+kit measures against it instead of assuming it:
+
+| What | Where | How |
+|---|---|---|
+| Spec phase | spec header `Intake started`, Decision Log approval, progress **Timeline** | `current_timestamp()` in the first discovery query |
+| Each task | progress **Time per task**: Started, Verified, Ticked, Agent min, Wait min, fix cycles, user-run steps | `current_timestamp()` folded into the claim-time and verification queries the task already runs (no extra query or approval) |
+| Manual estimate per task | `estimate:` line in `tasks.md` | proposed by the agent with a reason, confirmed or corrected by the user with the task list |
+| Work outside a track | `.internal_<email>/worklog.md`, one row per deliverable | first and last query of the work; estimate proposed in the closing message (`say "est 5h" to correct`) |
+| Org mode | `<catalog>.sdd.task_events` (`start`, `verified`, `worklog` events) | `event_ts` is the source of truth |
+
+Rules: a time is never guessed (`n/a` when no query ran, and the report says how many rows it excluded); estimates
+are labelled `agent` or `user`; rework (fix cycles, amendments, reopened tasks) is reported next to the saving. Ask
+`@de-sdd-tracking productivity report` for a track, `me`, or the team. The figure is a trend for improving the kit
+and the instructions, not a rating of people.
 
 ## Track types and statuses
 

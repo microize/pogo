@@ -2,7 +2,10 @@
 
 This project uses **spec-driven development (SDD)** for data engineering changes (ETL / ELT, warehouse models,
 CDC / SCD pipelines, ingestion, jobs) and for making that data understandable to people and AI: semantic layer
-(metric views, keys, comments, Genie Agents) and ontology / knowledge-graph design. Read this before acting. Package version: `_VERSION` in the installed skills folder.
+(metric views, keys, comments, Genie Agents) and ontology / knowledge-graph design. It serves data engineers,
+analytics engineers, data architects, data modelers, data stewards, tech leads and workspace admins, with advisory
+skills alongside, and measures the time it saves against manual estimates (target in `specs/project-profile.md`).
+Read this before acting. Package version: `_VERSION` in the installed skills folder.
 
 ## Non-negotiable rules
 
@@ -25,7 +28,9 @@ CDC / SCD pipelines, ingestion, jobs) and for making that data understandable to
 4. **Ledgers.** Evidence in `.internal_<your-email>/<track_id>/progress.md`; struggles in
    `.challenges_<your-email>/<track_id>.md`, redacted, **in every skill** (spec, implement, review, diagnose). A
    struggle is two failed attempts, any workaround, a file written to the wrong place, or a failed query. Write only
-   into your own folders.
+   into your own folders. **Time**: task start / verified / ticked times, and one `.internal_<your-email>/worklog.md`
+   row per deliverable outside a track, from `current_timestamp()` folded into a query you already run, never guessed;
+   propose a manual estimate the user can correct (`de-sdd-tracking`, "Time and effort").
 5. **Never change the spec silently.** Propose the amendment, wait for `approved`; Major amendments get a goldfish
    re-review.
 6. **Fresh-eyes review before approval** for full tracks: a **new chat** running
@@ -75,15 +80,17 @@ to back, self-fix with `de-run-diagnose`, a Validate block per task, tick on the
 | a new requirement, "spec this", "requirement", "greenfield", "brownfield", "new track", "hotfix track" | `de-sdd-spec` |
 | "approved", "implement", "next task", "work on T03" | `de-sdd-implement` |
 | "goldfish review", "review the spec", "fresh-eyes review" (in a NEW chat) | `de-goldfish-review` |
-| "status", "where are we", "what's left", "who did what", "what did we struggle with", "resume" | `de-sdd-tracking` |
+| "status", "where are we", "what's left", "who did what", "what did we struggle with", "resume", "time report", "productivity report", "how much time did we save" | `de-sdd-tracking` |
 | "advise", "advisor mode", "should we use X or Y", "which service", "review this architecture" | `de-advisor` |
 | "check the environment", "workspace readiness", "what compute do I have", quota / no compute / privilege errors | `de-env-check` |
 | "how much will it cost", "cheapest", "serverless or classic", "cost vs speed", "refresh prices" | `de-cost` |
 | "data model", "star schema", "bus matrix", "conformed dimension", "Data Vault", "grain", "ERD", "model review", "metric views", "semantic layer", "Genie on gold" | `de-data-modeling` |
 | "ontology", "knowledge graph design", "concepts / properties / relationships in our data", "glossary terms" | `de-ontology-design` |
+| "governance audit", "scorecard", "who owns this data", "steward", "PII classification", "tag taxonomy", "unprotected sensitive columns", "ABAC policy", "certify / deprecate", "CDMC" | `de-data-governance` |
 | "data contract", "schema change", "what breaks downstream", "impact" | `de-data-contract` |
 | "DQ rules", "expectations", "quarantine", "unit tests for the transformation" | `de-quality-testing` |
-| "run the pipeline", "it failed", a stack trace, "slow", "wrong numbers", "performance review" | `de-run-diagnose` |
+| "run the pipeline", "it failed", a stack trace, "slow", "wrong numbers", "performance review", "explain this log / Spark UI / query profile / plan" | `de-run-diagnose` |
+| "which cluster", "right-size", "cluster too big / idle", "warehouse size", "which runtime / DBR version", "what if we upgrade", "better function on our Spark version", "deprecated?" | `de-spark-runtime` |
 | "review this PR", "merge ready", "release checklist", "go / no-go", "deploy to prod" | `de-release-gate` |
 | old names (DLT, Asset Bundles, Workflows, Vector Search), SCD / CDC / medallion design, "which official reference" | `de-databricks-current` |
 | product syntax: pipelines, jobs, bundles, Zerobus, Lakeflow Connect, grants | official `databricks-pipelines`, `databricks-jobs`, `databricks-dabs`, `databricks-zerobus-ingest`, `databricks-lakeflow-connect`, `databricks-unity-catalog`; `databricks-docs` when none fits |

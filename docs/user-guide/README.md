@@ -1,40 +1,61 @@
-# User guide: data engineering with Genie Code and the `de-*` skills
+# User guide: Genie Code and the `de-*` skills
 
-Start here. This guide is for engineers who are new to the setup, including junior engineers. It explains what the
-setup is, how to start, and what to type day to day. You do not need to read the skill files to use it.
+Start here. This guide is for everyone who works with data on Databricks: data engineers, analytics engineers, data
+architects, data modelers, data stewards, tech leads, admins and business owners. You do not need to read any skill
+file to use it.
 
-## In one paragraph
+## What this is, in one minute
 
-Genie Code is the AI assistant built into the Databricks workspace. On its own it writes code when you ask. This
-package teaches it a **way of working**: it asks you questions first, writes a short plan called a **spec**, waits for
-you to approve it, then builds the pipeline **one task at a time**, checking each step and telling you how to check it
-too. It also keeps a record of who did what, warns you about cost, and refuses dangerous actions such as dropping
-tables or deploying to production.
+**Genie Code** is the AI assistant inside the Databricks workspace. On its own, it writes code when you ask.
+
+This kit gives it a **way of working**. When you ask for something new, it:
+
+1. **asks you questions first**, each with a suggested answer,
+2. **writes a short plan** (we call it a *spec*) and waits until you say `approved`,
+3. **builds one small step at a time**, checks each step, and shows you how to check it too,
+4. **explains** errors, logs and slow queries in plain words, and fixes them,
+5. **keeps a record** of who did what, how long it took, and what went wrong,
+6. **never** deletes tables, changes permissions or touches production. A person does those.
+
+It also helps you **design** data (models, metrics, Genie Agents, ontologies), **govern** it (owners, sensitive data,
+certification) and **choose** the right compute, runtime and cost.
+
+## The example used in this guide
+
+Every page uses the same example, so you can follow one story:
+
+> **ShopCo** is a small online shop. Every day, order files (JSON) and a customer file (CSV) land in a Databricks
+> volume. The sales managers want a daily revenue dashboard and a Genie Agent they can ask "What was revenue by
+> country last week?". The customer file has email addresses and phone numbers, so it must be protected.
+
+[Page 3](03-first-task.md) follows ShopCo from the first question to production.
 
 ## Read in this order
 
 | # | Page | Read it when |
 |---|---|---|
-| 1 | [What it is and the words we use](01-what-is-this.md) | first day |
-| 2 | [One-time setup](02-setup.md) | before your first task (your lead or admin may have done it) |
-| 3 | [Your first task, step by step](03-first-task.md) | first task; it walks through a real example |
+| 1 | [What it is and the words we use](01-what-is-this.md) | your first day |
+| 2 | [One-time setup](02-setup.md) | before your first task (your admin or lead may have done it) |
+| 3 | [The ShopCo example, start to finish](03-first-task.md) | before your first task; it shows every step |
 | 4 | [Everyday use: what to type](04-everyday-use.md) | keep it open while you work |
 | 5 | [Files and folders in a project](05-files-and-folders.md) | when you wonder what a file is for |
-| 6 | [Cost, environments and teams](06-cost-and-environments.md) | before choosing compute or going to prod |
+| 6 | [Cost, environments and teams](06-cost-and-environments.md) | before choosing compute or going to production |
 | 7 | [Troubleshooting and FAQ](07-troubleshooting.md) | when something looks stuck or wrong |
+| 8 | [Roles: where to start](08-roles.md) | to find your starting point if you are not a data engineer |
+| 9 | [Skills by role and lifecycle stage](09-skills-by-role-and-lifecycle.md) | to see which skill helps you at each stage |
 
-## The five rules to remember
+## Five rules to remember
 
-1. **Say what you need in plain words.** You do not need to know skill names; Genie Code picks the right one.
-2. **Nothing is built before you reply `approved` to the spec.** Read the spec summary before you approve it.
-3. **Check each task** with the "Validate" step the agent gives you, then reply `ok`.
-4. **Dev only.** The agent never deploys to production, never drops tables and never changes permissions. A human
-   does those, after the release gate says GO.
-5. **Start a new chat for each new piece of work.** Skills load at the start of a chat; the project files, not the chat,
-   are the memory.
+1. **Say what you need in plain words.** You do not need skill names. Genie Code picks the right skill.
+2. **Nothing is built until you reply `approved`.** Read the spec summary first. "ok" or "looks fine" does not count.
+3. **Check each step.** After each task you get a short "Validate" note. Run the check, then reply `ok`.
+4. **Dev only.** The agent works in the development environment. A person deploys to production, after the release
+   check says GO.
+5. **One new chat per piece of work.** Skills load when a chat starts. The project files, not the chat, hold the
+   memory, so nothing is lost when you close a chat.
 
 ## Who to ask
 
-- The method or a skill behaves wrongly: the maintainers of this repo.
-- Access, compute, quota or "not allowed" errors: your workspace admin, with the checklist in
+- A skill behaves wrongly, or you have an idea to improve one: the maintainers of this kit.
+- Access, compute, quota or "not allowed" errors: your workspace admin. Show them the checklist in
   `specs/env/<env>-<team>.md` of your project.

@@ -4,7 +4,7 @@
 # MAGIC
 # MAGIC Run this notebook **from a Git folder of this repo** in the Databricks workspace. It installs two sets from the repo,
 # MAGIC so no internet access is needed:
-# MAGIC - the 14 `de-*` skills of this kit (`skills/`)
+# MAGIC - the 16 `de-*` skills of this kit (`skills/`)
 # MAGIC - 16 official `databricks-*` skills, vendored unmodified at a pinned release (`install/official/`, see `SOURCE.md`)
 # MAGIC
 # MAGIC | Widget | Values | Effect |
@@ -16,7 +16,7 @@
 # MAGIC
 # MAGIC Both scopes write a `_VERSION` stamp next to the skills and check that `AGENTS.md` and `instructions/*.md` stay
 # MAGIC under Genie Code's 20,000 character cap (a `WARN` line names any file over it).
-# MAGIC The last cell verifies every installed file against this repo and prints e.g. `30 ok, 0 failed` (14 + 16).
+# MAGIC The last cell verifies every installed file against this repo and prints e.g. `32 ok, 0 failed` (16 + 16).
 # MAGIC Start a **new** Genie Code chat afterwards.
 
 # COMMAND ----------

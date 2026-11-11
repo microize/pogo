@@ -1,67 +1,105 @@
 # 4. Everyday use: what to type
 
-Always open a file in the project first, then a **new chat** for each new piece of work. Write in plain words; include
-the project folder path if the chat might not know it.
+Before you start: open a file inside the project, then start a **new chat** for each new piece of work. Write in plain
+words. If the chat might not know the project, add its path.
+
+## Three sizes of work
+
+The agent picks the size from your words; you can say it yourself ("small change", "hotfix").
+
+| Size | Use it for | What you get | ShopCo example |
+|---|---|---|---|
+| **full** | new pipelines, new tables, anything with several steps | questions, a spec, a fresh-eyes review, a plan, 8 to 15 tasks | the whole ShopCo sales pipeline |
+| **small** | one table or one rule changes | a one-page spec, one build task, one test task, a merge check | "add a region column to silver orders" |
+| **hotfix** | a bug in production | a one-paragraph spec with a before / after check, one fix task, a merge check | "fact_orders counts cancelled orders twice" |
+
+All three need your `approved` before any code is written.
 
 ## Short replies the agent understands
 
 | You type | Meaning |
 |---|---|
-| `defaults` | accept every recommended answer in the current question round |
-| `enough` | stop asking, draft the spec |
-| `approved` | approve the spec or an amendment (only this word counts, not "ok") |
+| `defaults` | accept every suggested answer in the current round of questions |
+| `enough` | stop asking questions and write the spec |
+| `approved` | approve the spec or a change to it (only this word counts, not "ok") |
 | `goldfish` | ask for a fresh-eyes review before approving |
 | `resolve review` | go through the review findings and propose fixes |
-| `ok` | the task's Validate step looks right: tick it and continue |
+| `ok` | the task's Validate check looks right: tick it and continue |
 | `auto` | tick tasks whose checks passed without waiting for me |
 | `next` | continue with the next task |
-| `check` | the run I was told to wait for should be done now: verify it |
+| `check` | the run you told me to wait for should be done now: check it |
 | `stop` | pause here |
-| `status` | where is this track, who did what, what is left |
+| `status` | where is this work, who did what, what is left |
+| `est 5h` | correct the agent's manual estimate for the work it just logged |
 
-## Common requests by situation
+## What to type, by situation (with ShopCo examples)
 
 | Situation | Example |
 |---|---|
-| New pipeline or table | `build a pipeline that loads daily customer CSVs from <path> into silver with SCD2` |
-| Small change to existing work | `add a region column to silver orders from the shipping region field (small change)` |
-| Production bug | `hotfix: gold fact_orders double counts cancelled orders` |
-| Continue work from yesterday | `status of track <track_id>` then `next` |
-| Something failed | `the dev pipeline <name> failed today, find out why and what to change` |
-| Data quality | `propose data quality rules and tests for <tables>` |
-| Data model (modellers) | `design the dimensional model for order analytics: revenue by day, segment, country` |
-| Choose a technology | `advise: Zerobus, Lakeflow Connect or Auto Loader for 2,000 events per second?` |
-| Cost | `how much does the daily pipeline cost, and would serverless be cheaper or faster?` |
-| Contract and impact | `write the data contract for <table> and tell me what breaks if we drop <column>` |
-| Before merging | `review this track for merge` |
-| Before production | `is <track_id> ready for production? go / no-go` |
-| Hand work to a teammate | `hand over tasks T05 to T07 of <track_id> to alex@company.com` |
-| Workspace problems | `check this workspace's readiness` or `recheck` |
-| Price list is old | `refresh prices` |
+| New pipeline or table | `build a pipeline that loads the daily ShopCo order JSON from /Volumes/dev_shop/raw/orders/ into bronze, silver and gold` |
+| Small change | `add a region column to silver orders from the shipping region field (small change)` |
+| Production bug | `hotfix: gold fact_orders counts cancelled orders twice` |
+| Continue yesterday's work | `status of shop_orders_20261112`, then `next` |
+| Something failed | `the dev pipeline shop_orders failed today: find out why and what to change` |
+| Understand an error or log | `explain this stack trace` (paste it) |
+| Understand a slow query | `explain this query profile` (paste the JSON from Query History > Download), or `why is stage 12 slow?` (paste the Spark UI stage summary) |
+| Data quality | `propose data quality rules and tests for silver orders and customers` |
+| Data model | `design the model for sales reporting: revenue by day, country and segment` |
+| Metrics and Genie | `set up metric views and a Genie Agent on gold sales, with descriptions and keys` |
+| Business concepts | `what concepts and relationships do our customer and order tables support?` |
+| Governance | `governance audit of dev_shop: owners, descriptions, sensitive data, unprotected columns` |
+| Choose a technology | `advise: Auto Loader or Lakeflow Connect for files that arrive by SFTP?` |
+| Choose or size compute | `which compute for a nightly 200 GB join job?`, `is cluster etl-nightly too big?`, `right-size warehouse sales_wh` |
+| Runtime and code versions | `we run DBR 15.4: which functions in bronze_orders.py should change, and what would 18 LTS give us?` |
+| Cost | `how much does the daily ShopCo pipeline cost, and would serverless be cheaper?` |
+| Contract and impact | `write the data contract for gold fact_orders and tell me what breaks if we drop region` |
+| Before merging | `review shop_orders_20261112 for merge` |
+| Before production | `is shop_orders_20261112 ready for production?` |
+| Hand work to a teammate | `hand over T05 to T07 of shop_orders_20261112 to ben@shopco.com` |
+| Workspace problems | `check this workspace's readiness`, or later `recheck` |
+| Time saved | `productivity report for me, last 30 days` |
+| Old price list | `refresh prices` |
 
 ## Working with teammates
 
-- **Each person has their own ledgers** (`.internal_<email>/`, `.challenges_<email>/`). Write only in your own.
-- **Tasks have owners.** The agent claims a task in `tasks.md` with your email before working on it, and skips tasks
-  someone else holds.
-- **Git folder**: in the folder's Git dialog, **Pull** before you start and **Commit & Push** after each ticked task (the
-  agent suggests the commit message `feat(<track_id>): T03 ...`). A job runs whatever is in the Git folder, so keep
-  it at a ticked, committed state. Plain folder: the agent re-reads the file before saving to avoid overwriting a teammate.
+- **Each person has their own record folders** (`.internal_<email>/`, `.challenges_<email>/`). Write only in your own.
+- **Tasks have owners.** The agent writes your email on a task before it works on it, and skips tasks someone else
+  owns.
+- **Git folder:** in the folder's Git dialog, click **Pull** before you start and **Commit & Push** after each ticked
+  task. The agent suggests the message, for example `feat(shop_orders_20261112): T03 bundle`. A job runs whatever is in
+  the Git folder, so keep it at a ticked, committed state.
+- **Plain folder:** the agent re-reads a file just before saving, so it does not overwrite a teammate's change.
 - **Going on leave?** Ask for a handover. The agent writes a note with everything the next person needs and moves your
   open tasks to them.
 
+## Time and estimates
+
+The agent records when each task starts and finishes, using the workspace clock. It adds `current_timestamp()` to a
+query it was going to run anyway, so you get no extra approval prompts.
+
+With the task list, it suggests a **manual estimate** per task (how long it would take by hand). Correct any that look
+wrong in the same reply. After advice, a model, a diagnosis or other work outside a track, it ends with a line like:
+```
+Logged: about 3 h by hand (say "est 5h" to correct).
+```
+Nothing is guessed: a step with no query shows `n/a`. The productivity report compares time taken with the estimates,
+and shows rework (fix cycles, changes to the spec) next to the saving. It is for improving the kit, never for rating
+people.
+
 ## Approvals inside Genie Code
 
-Genie Code asks **Allow / Skip** before running SQL or API calls. Read the short code, then allow. Read-only queries
-(`SELECT`, `SHOW`, `DESCRIBE`, `LIST`) are safe. Be careful with anything that writes, and refuse anything outside dev.
-There is a per-chat **Auto-approve** toggle in the drop-down of a pending step; use it only if your team agreed to, and
-never in a workspace with production data.
+Genie Code asks **Allow / Skip** before it runs SQL or calls an API. Read the short code, then allow.
+
+- Read-only queries (`SELECT`, `SHOW`, `DESCRIBE`, `LIST`) are safe.
+- Be careful with anything that writes. Refuse anything outside dev.
+- There is an **Auto-approve** switch for one chat, in the drop-down of a pending step. Use it only if your team
+  agreed, and never in a workspace with production data.
 
 ## Habits that save time
 
-- One chat per track or question; long chats get slow and lose focus. The files carry the memory.
+- One chat per track or question. Long chats get slow and lose focus. The files carry the memory.
 - Keep your team's SQL warehouse attached in the editor.
-- When the agent asks a question, answer all of it in one reply.
-- Read the spec summary before `approved`. Changing a spec later is possible but costs time.
-- If the agent seems stuck on a step that already finished (see [Troubleshooting](07-troubleshooting.md)), tell it
-  "the query finished, continue" instead of starting over.
+- When the agent asks questions, answer all of them in one reply.
+- Read the spec summary before `approved`. Changing a spec later is possible, but costs time.
+- If a step looks stuck but has already finished (see [Troubleshooting](07-troubleshooting.md)), tell the agent "the
+  query finished, continue" instead of starting over.
