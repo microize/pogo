@@ -12,7 +12,8 @@ Last updated: <YYYY-MM-DD> by <email>. One per repo. Read by every track.
 | Compute available | SQL warehouse: <name, size, auto-stop>; serverless notebooks/jobs/pipelines: yes \| no; clusters: <name, access mode, auto-stop> |
 | Pipeline engine | Lakeflow Spark Declarative Pipelines |
 | Orchestration | Lakeflow Jobs |
-| Deployment | Declarative Automation Bundles, CLI version |
+| Deployment | Declarative Automation Bundles from the Git folder Deployments panel (needs serverless) \| jobs via Jobs API / SDK (API-managed) |
+| Runtime | serverless environment version \| cluster DBR version; pipeline channel CURRENT |
 | Source control | Git folder (remote, default branch) or plain workspace folder |
 | Run-as identity (prod) | service principal <name> |
 

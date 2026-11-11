@@ -14,7 +14,7 @@
 
 ## 2. Dependency map (from system.access.table_lineage, last 90 days)
 
-| Consumer | Type (table / dashboard / genie space / job / notebook / share / external) | Owner | Uses | Last seen |
+| Consumer | Type (table / dashboard / Genie Agent / job / notebook / share / external) | Owner | Uses | Last seen |
 |---|---|---|---|---|
 
 ## 3. Blast radius

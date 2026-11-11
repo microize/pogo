@@ -2,7 +2,7 @@
 name: de-sdd-tracking
 description: Owns the work ledgers for spec-driven data engineering on Databricks so a team knows who did what: task claims in tasks.md (and the optional Unity Catalog events table), .internal_<email>/<track_id>/progress.md (evidence per task), .challenges_<email>/<track_id>.md (where the agent struggled), and track status. Use for "status", "where are we", "what is left", "who did what", "what did we struggle with", "show challenges", or when another skill must create or update these files. Does not implement tasks.
 metadata:
-  version: "0.4.0"
+  version: "0.5.0"
 ---
 
 # de-sdd-tracking: ledgers, claims, status
@@ -65,7 +65,8 @@ If the line now shows someone else, back off and pick the next eligible task.
 
 ### tick / block / unclaim
 Change only that task's marker, keep the owner, sync. Append the evidence row to `progress.md` (command or
-query, result numbers, files, commit or Git folder commit message). `[!]` needs a one-line blocker and a challenge entry.
+query, pipeline update id or job run id, result numbers, files, commit or Git folder commit message). On tick, also
+update the track's status and done count in `.internal_<email>/index.md`. `[!]` needs a one-line blocker and a challenge entry.
 `unclaim` when a person stops without finishing: marker back to `[ ]`, owner removed, note in `progress.md`.
 
 ### log challenge
@@ -88,7 +89,8 @@ credentials, row values, PII. Paste the error class and message, not query outpu
    that is on the branch (Git folder); in org mode also `SELECT ... FROM <events table> WHERE track_id = ...`.
 2. Report: track and status; done n of m with owner and date per task; in progress and blocked with owner and blocker;
    next claimable task (deps satisfied); open challenges per person. State the topology caveat in one line
-   ("Git folder: shows what is pushed").
+   ("Git folder: shows what is pushed"). In a Git folder, flag tasks ticked but not yet committed (no commit carrying
+   their `T<nn>` in `progress.md`).
 3. `resume` hands off to `de-sdd-implement`.
 
 ### who did what
@@ -112,6 +114,7 @@ They are per person, redacted, and anyone may ask the lead to exclude their chal
 (`.gitignore` entry) and share only the lessons. Retention is stated in `specs/project-profile.md`.
 
 ## Changelog
+- 0.5.0: QA and gap-analysis fixes: status flags ticked-but-uncommitted tasks in a Git folder; tick updates index.md; evidence carries the update or run id.
 - 0.4.0: workspace-only: Git folder UI and bundle Deployments panel replace local CLI and CI steps.
 - 0.3.0: ledger writes once per task (fewer save conflicts); handover operation.
 - 0.2.0: topology table, UC events table, claim rules with dependencies, status enum, redaction, consent note, index template.

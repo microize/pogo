@@ -17,9 +17,10 @@ cluster and pipeline reads; `WorkspaceClient()` in a Python cell only if Python 
 |---|---|---|
 | SQL warehouses | warehouse list: name, state, size, serverless, auto-stop | which one to use for checks and SQL tasks |
 | Clusters | cluster list: name, state, node type, workers, `data_security_mode`, auto-termination | **access mode NONE ("No isolation shared") cannot read Unity Catalog**; SINGLE_USER / USER_ISOLATION can |
-| Serverless notebooks / jobs | available compute list in Genie Code; a "Limited capabilities" banner on a SQL warehouse means no serverless Python | yes / no |
+| Serverless notebooks / jobs | available compute list in Genie Code; a "Limited capabilities" banner on a SQL warehouse means no serverless Python | yes / no; if no, **Blocking** for the default deploy route (the Git folder bundle Deployments panel needs serverless); record the alternatives: create jobs through the Jobs API / Python SDK on allowed classic compute, or an admin enables serverless |
 | Serverless pipelines | not visible from a validate; if unknown, ask the admin and record "unknown" | yes / no / unknown |
 | Quota signal | events of recent clusters for `AZURE_QUOTA_EXCEEDED_EXCEPTION`, `QuotaExceeded`, long `WAITING_FOR_RESOURCES`; sum the cores of running clusters | cores in use; regional limit if known |
+| Workspace previews that change designs | e.g. multiple triggers per job (file arrival plus schedule); look in the job trigger UI or ask the admin | per preview: yes / no / unknown (check; never assume) |
 
 ## 3. Unity Catalog
 
@@ -30,6 +31,7 @@ cluster and pipeline reads; `WorkspaceClient()` in a Python cell only if Python 
 | External locations | external location list | which one new catalogs can use |
 | Landing volumes | `SHOW VOLUMES IN <catalog>.<schema>` for the named source | exists / missing |
 | Create rights | `SHOW GRANTS ON CATALOG <dev catalog>` | USE CATALOG, CREATE SCHEMA |
+| Zero-copy dev data | can the user `SHALLOW CLONE` a source table into the dev catalog (SELECT on source, CREATE TABLE in dev) | yes / no; caveats: not for tables with row filters or column masks, and no clone of a shallow clone |
 
 ## 4. System tables
 
@@ -56,7 +58,8 @@ and grant `USE SCHEMA` and `SELECT`.
 | Check | How | Record |
 |---|---|---|
 | Team's compute | warehouses and clusters whose owner, tags (`team`, `cost_center`) or permissions (`CAN_USE`, `CAN_ATTACH_TO`, `CAN_RESTART`) include this team | the only compute the agent may use |
-| Cluster policies | policy list and which the team may use | node types and sizes allowed; design within them |
+| Cluster owners | each cluster's `creator_user_name` (creator field) | owner as recorded; never infer ownership or team from a name |
+| Cluster policies | policy list and which the team may use (`CAN_USE`); per policy, whether a single-node job cluster is allowed (some default Job Compute policies reject single-node) | node types, sizes and single-node yes / no allowed; design within them |
 | Other teams' compute | running clusters not owned by the team (names only) | counts against shared quota; never use, start or stop |
 | Quota share | cores in use by all running clusters vs the regional limit (if known) | team's agreed share, or "ask the platform team" |
 | Catalog ownership | `SHOW CATALOGS`, owners | which catalogs belong to the team; read only those (guardrails) |
@@ -86,6 +89,8 @@ another environment's findings.
 
 | Finding | Design consequence |
 |---|---|
+| no serverless notebooks / jobs | **Blocking** for the default deploy route (Deployments panel); jobs are created with the Jobs API / Python SDK on an allowed policy, or an admin enables serverless |
+| policy rejects single-node job clusters | job clusters use the smallest multi-node shape the policy allows, or a policy that allows single-node |
 | no serverless pipelines | classic pipeline compute, smallest shape, Photon off in dev, shutdown delay about 5 min; MVs fully recompute; about 10 min start per update, so pre-check SQL on the warehouse and batch verifications |
 | no Python compute | verification in SQL only; no polling loops; "say check in N minutes" |
 | low vCPU quota | one classic workload at a time; record "stop cluster X during runs" |

@@ -2,7 +2,7 @@
 name: de-env-check
 description: Workspace readiness check for Databricks data engineering, per environment (dev / staging / prod) and per team. Use when starting a new project or track, when the user says "check the environment", "workspace readiness", "what compute do I have", "can I run pipelines here", "prerequisites", "onboard this workspace", "is prod ready", or when a run fails for an environment reason (no compute, quota exceeded, waiting for resources, insufficient privileges, catalog cannot be created). Read-only probe of compute, quota signals, Unity Catalog, system tables and tooling; writes the environment index in specs/project-profile.md and specs/env/<env>-<team>.md with an admin checklist. Never changes settings, grants or clusters.
 metadata:
-  version: "0.3.0"
+  version: "0.4.0"
 ---
 
 # de-env-check: know what this workspace can run before designing
@@ -45,8 +45,11 @@ clusters, warehouses, policies and quota share. So:
    `## Environment (de-env-check)` section is younger than 30 days and nothing failed since, show it and stop unless
    asked to refresh.
 2. **Run the checks** in `references/checks.md`, in order: identity and admin rights; SQL warehouses; clusters
-   (state, node type, cores, **access mode**, auto-stop); serverless for notebooks, jobs and pipelines; quota signals;
-   Unity Catalog (catalogs, metastore storage root, external locations, create rights); system tables (lineage,
+   (state, node type, cores, **access mode**, auto-stop, owner from the creator field); cluster policies the user can
+   use and whether they allow single-node job clusters; serverless for notebooks, jobs and pipelines (no serverless
+   is **Blocking** for the default Deployments-panel route); quota signals; design-changing workspace previews
+   (yes / no / unknown); Unity Catalog (catalogs, metastore storage root, external locations, create rights, shallow
+   clone for zero-copy dev data); system tables (lineage,
    billing, query history); landing volumes; tooling (Git folder, bundle Deployments panel, official skills installed).
 3. **Classify each workload** as OK, LIMITED or MISSING with the evidence: SQL, Python notebooks, jobs, Lakeflow
    pipelines, streaming, lineage-based impact analysis, cost reporting, bundle deployment.
@@ -72,6 +75,8 @@ signatures"), re-run only the affected checks, update the Environment section, a
 and log a challenge through `de-sdd-tracking`.
 
 ## Changelog
+- 0.4.0: QA and gap-analysis fixes: no serverless is Blocking for the Deployments-panel route (alternatives recorded),
+  cluster policies and single-node, design-changing previews, owners from the creator field, shallow clone for dev data.
 - 0.3.0: workspace-only: Pipelines Editor, SDK, Git folder UI and bundle Deployments panel replace local CLI and CI steps.
 - 0.2.0: per-environment and per-team records (environment index plus specs/env/<env>-<team>.md), team-owned compute
   only, shared quota, bundle target to environment match, other-environment probe.

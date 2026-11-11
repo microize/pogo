@@ -17,6 +17,7 @@ Rules
 - Progressive structure is mandatory: smallest slice, small data, expand one component at a time, deploy, full data, gate.
   No task scales up before the small-data task passed.
 - `test_mode` / `limit_rows` below are parameters **you add** to the pipeline configuration; they are not platform features.
+- Optional per task: `touches:` the tables and files it writes, so two people do not claim tasks that write the same object.
 
 ## Phase A: Prerequisites
 
@@ -36,6 +37,7 @@ Rules
 
 - [ ] **T04** Bronze streaming table `<table>` from `<source>` (one source, one table)
   - files: `src/<pipeline>/bronze_<table>.py` (or `.sql`)
+  - touches (optional): `<catalog>.<bronze schema>.<table>`
   - depends: T02, T03
   - verify in-workspace: dry run passes; dev update with `limit_rows` (SDK `pipelines.start_update` or the editor Run button); `SELECT count(*) FROM <bronze>` > 0; `SELECT count(*) FROM <bronze> WHERE _rescued_data IS NOT NULL` = 0; event log has no ERROR
   - validate: schema matches the contract; sample rows look right
@@ -78,6 +80,7 @@ Rules
 
 ## Minimum per track type
 
-- **hotfix** (production incident, one file): T01 section, one fix task with in-workspace verification, release gate PR mode. Spec is the one-paragraph "Goal" plus acceptance query; goldfish review skipped and recorded.
-- **small** (one table or one rule change): T01, one build task, one test task, release gate. One-page spec, no goldfish review unless a key, grain or SCD type changes.
+- Gate output files: a merge review (PR gate) writes `specs/<track_id>/pr_review_<n>.md`; the production gate writes `release_<n>.md`.
+- **hotfix** (production incident, one file): T01 section, one fix task with in-workspace verification, release gate PR mode (`pr_review_<n>.md`). Spec is the one-paragraph "Goal", the "Unchanged behaviour" before/after queries, plus acceptance query; goldfish review skipped and recorded.
+- **small** (one table or one rule change): T01, one build task, one test task, release gate (PR gate `pr_review_<n>.md` for merge; prod gate `release_<n>.md` before a prod deploy). One-page spec, no goldfish review unless a key, grain or SCD type changes.
 - **full**: everything above.

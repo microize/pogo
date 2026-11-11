@@ -44,8 +44,9 @@ the project folder path if the chat might not know it.
 - **Each person has their own ledgers** (`.internal_<email>/`, `.challenges_<email>/`). Write only in your own.
 - **Tasks have owners.** The agent claims a task in `tasks.md` with your email before working on it, and skips tasks
   someone else holds.
-- **Git folder**: in the folder's Git dialog, **Pull** before you start and **Commit & Push** after each task (the
-  agent suggests the commit message `feat(<track_id>): T03 ...`). Plain folder: the agent re-reads the file before saving to avoid overwriting a teammate.
+- **Git folder**: in the folder's Git dialog, **Pull** before you start and **Commit & Push** after each ticked task (the
+  agent suggests the commit message `feat(<track_id>): T03 ...`). A job runs whatever is in the Git folder, so keep
+  it at a ticked, committed state. Plain folder: the agent re-reads the file before saving to avoid overwriting a teammate.
 - **Going on leave?** Ask for a handover. The agent writes a note with everything the next person needs and moves your
   open tasks to them.
 

@@ -2,7 +2,7 @@
 name: de-sdd-spec
 description: Spec-driven intake for Databricks data engineering work. Use when the user brings a new requirement or says "spec this", "write the spec", "requirement", "greenfield", "brownfield", "new track", "hotfix track", or asks to plan a data product before building it. Runs discovery, asks clarifying questions in rounds, writes specs/<track_id>/spec.md, waits for the user's explicit approval, resolves goldfish reviews, then produces plan.md and tasks.md. Never writes pipeline code. For syntax or building an already-approved pipeline use the official databricks-pipelines skill or de-sdd-implement.
 metadata:
-  version: "0.4.0"
+  version: "0.5.0"
 ---
 
 # de-sdd-spec: requirement to approved spec
@@ -11,7 +11,7 @@ You turn a data engineering requirement into an **approved spec** and an **order
 pipeline, SQL, notebook or bundle code. That is `de-sdd-implement`, and only after approval.
 
 **Precedence**: if an official `databricks-*` skill also loaded on this request and no spec with
-`Status: APPROVED` exists for it, this skill wins; read the official skill for syntax only.
+`Status: APPROVED` exists for it, this skill governs the process; read the official skill for syntax and mechanics.
 
 ## Flow
 
@@ -47,9 +47,14 @@ before drafting. For warehouse or analytics tracks (facts, dimensions, KPIs, sta
   "defaults" accepts all recommendations. Do not ask what discovery answered.
 - After each round: "Enough to draft, or ask more?" Stop when the user says enough or after **5 rounds**; unanswered
   items become `[ASSUMED]` in the spec.
-- **Decisions file** (use for several tables or several stakeholders): write rounds to
-  `specs/<track_id>/decisions.md` (template `templates/decisions.md`), the user edits Answer cells and says `done`,
-  later rounds are **appended**, never overwritten.
+- **Decisions file**: append every round's questions and answers to `specs/<track_id>/decisions.md` (template
+  `templates/decisions.md`) at the end of that round, also when the interview runs in chat; for several tables or
+  stakeholders the user edits Answer cells and says `done`. Later rounds are **appended**, never overwritten.
+- **Memory notes** for a track start with the project name (`<project>/<track_id>: ...`); track ids repeat across
+  projects.
+- **Deploy route** (ask in Round 1 when the environment record says no serverless): the Git folder Deployments panel
+  needs serverless. Options: (a) an admin enables serverless (recommended); (b) the agent creates **dev** jobs in-workspace
+  with the Jobs API / Python SDK, recorded in the spec as API-managed, not bundle-managed; non-dev jobs are user-run.
 - **Dimension completeness** (warehouse tracks): in Round 2 list every text, code, flag, date and geo field as a
   dimension candidate with `Include Y/N`. Never silently drop a field.
 
@@ -116,6 +121,10 @@ Declarative pipelines with AUTO CDC over hand-written MERGE; bronze streaming ta
 expectations, gold materialized views; serverless, triggered, liquid clustering; catalog and schema parameterized;
 language (SQL or Python) is a project choice recorded in `project-profile.md`. Other services (Lakeflow Connect,
 Zerobus) go in "Alternatives considered"; `de-advisor` elaborates on request.
+**File arrival plus a schedule on one job**: a job can carry both a `schedule` and a file-arrival `trigger`
+(`databricks-jobs/references/triggers-schedules.md`, "Combining Triggers"); confirm the workspace accepts it. Fallback:
+a second, schedule-only job whose single Run Job task starts the main job, so the main job's
+`max_concurrent_runs: 1` serializes the runs. Two independent jobs do not queue against each other.
 
 ## Anti-patterns
 
@@ -124,6 +133,7 @@ Reviewing your own spec in the same chat and calling it a goldfish review. Setti
 verbatim reply in the Decision Log.
 
 ## Changelog
+- 0.5.0: QA and gap-analysis fixes: deploy route asked when no serverless, file arrival plus schedule decision, decisions.md appended every round, project-prefixed memory notes, templates (profile runtime row, plan rollback matches release gate, pr_review vs release files, Touches field, hotfix unchanged-behaviour section, invariant acceptance checks).
 - 0.4.0: workspace-only: Git folder UI and bundle Deployments panel replace local CLI and CI steps.
 - 0.3.0: owner team asked once per project; known test gaps section in the spec.
 - 0.2.3: discovery delegates environment probing to de-env-check and gold design to de-data-modeling.

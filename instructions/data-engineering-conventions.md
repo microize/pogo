@@ -8,6 +8,9 @@ Read before writing pipeline, SQL, bundle or job code. Routed from `AGENTS.md`; 
 - **Silver**: typed, deduplicated, conformed; expectations enforced; AUTO CDC for entity history; rejected rows to `<table>_quarantine`.
 - **Gold**: materialized views and metric views; star schema or wide table per the spec; grain stated.
 - Layer transitions are documented in the data contract (`specs/contracts/`).
+- Bronze `expect_or_fail` only on key and sequence columns; other bronze expectations log only.
+- PII: tagged at bronze, hashed or masked by silver, none in gold. New tables keep personal fields in a separate PII table keyed by a surrogate id, so erasure requests anonymize one row and business records stay.
+- AI Functions (`ai_query`, `ai_classify`, ...): not in bronze; sample in dev first; persist results in a table, never recompute per read; estimate the cost in the spec.
 
 ## Delta tables
 
@@ -17,6 +20,8 @@ Read before writing pipeline, SQL, bundle or job code. Routed from `AGENTS.md`; 
 - `delta.deletedFileRetentionDuration` at least 7 days on prod targets so time travel can roll back.
 - Column mapping mode `name` only when a rename or drop is approved in an impact report.
 - Type widening on; prefer widening to re-creating a column.
+- `COMMENT` on every table (and key columns); never set `owner` in code or bundles.
+- `pipelines.reset.allowed = false` on SCD2 targets and on bronze tables whose source has short retention.
 
 ## Writes
 
@@ -62,7 +67,7 @@ Read before writing pipeline, SQL, bundle or job code. Routed from `AGENTS.md`; 
 
 ## Deliverables per track
 
-- `databricks.yml` with `dev` and `prod` targets; `resources/*.yml`; `src/` one dataset per file.
+- `databricks.yml` with `dev` and `prod` targets (add `staging` if used); `resources/*.yml`; `src/` one dataset per file.
 - Tests under `tests/` and run on Databricks before a task is ticked.
 - Spec, plan, tasks, decisions, contracts and gate reports under `specs/`.
 - Entry points for `spark_python_task` wheels include an `if __name__ == "__main__":` block that parses arguments and exits with a code.

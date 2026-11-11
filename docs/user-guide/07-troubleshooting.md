@@ -11,8 +11,12 @@ These all happened during our tests. Most are environment or display issues, not
 | It writes files in your home folder instead of the project | it did not know the project root | open a file inside the project before chatting, and mention the project path |
 | "I stopped because I kept repeating the same action" | Genie Code's loop guard, usually while waiting for a run | reply `continue`, and if it was waiting, tell it to stop polling and wait for your `check` |
 | A step shows "running" for minutes, but should be quick | the panel display hung; the query may already be done | look in Query History; if it finished, tell the agent "the query finished, continue" (stopping the display is not cancelling the query) |
-| "Failed to edit" then it retries | two saves overlapped | nothing; it re-reads and retries once. Accept pending edits with **Accept all** to keep things tidy |
+| "Failed to edit", a save conflict, or an edit that hangs | two saves overlapped, or the display hung | stop it and ask the agent to re-read the file; do not re-send the request (the edit was usually saved) |
+| Files it wrote are gone later | pending assets were never accepted | click **Accept all** on pending files after each step |
 | It asks Allow / Skip for every query | Genie Code's safety default | read and allow; or, if your team agreed, use Auto-approve in that chat's drop-down |
+| The Allow / Skip prompt does not show the SQL text | display limit of the prompt | check **Query History** for the statement, or ask the agent to print the SQL in chat first |
+| Typing `@` opens a picker and eats `@dp.table` | `@` opens the mention picker | press **Escape**, then keep typing the decorator |
+| A pipeline or job failed, errored or is slow | a general answer skips the diagnosis method | start the question with `@de-run-diagnose` and paste the error text |
 | It answers with old names (DLT, APPLY CHANGES) | an old snippet in the request | the project's AGENTS.md maps old to new; ask "use current names" |
 
 ## Compute, quota and permissions

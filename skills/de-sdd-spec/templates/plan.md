@@ -36,4 +36,4 @@ source --> bronze (streaming table) --> silver (streaming table + AUTO CDC) --> 
 
 ## Rollback
 
-How to undo: in dev, user-run with the user's explicit instruction: remove the dev resources from the bundle Deployments panel, or ask an admin; in prod, pause the job, redeploy the previous tag from the prod workspace's Git folder Deployments panel, keep tables (see `de-release-gate`).
+How to undo: in dev, user-run with the user's explicit instruction: remove the dev resources from the bundle Deployments panel, or ask an admin; in prod, pause the job, switch the prod workspace's Git folder to the previous release branch `release/<track_id>-<n>` and deploy the `prod` target from the Deployments panel, keep tables; data rollback with `RESTORE TABLE` within retention, run by a human (see `de-release-gate`).

@@ -53,8 +53,23 @@ Liquid clustering (`CLUSTER BY AUTO`) plus predictive optimization on managed ta
 ## Full refresh needed (dev)
 Pipelines Editor **Full refresh** in dev, or `WorkspaceClient().pipelines.start_update(pipeline_id=..., full_refresh=True)`, with the user's agreement. In prod, plan it as a task with a backfill window and the user's approval.
 
+## Repair a failed job run (re-run only the failed tasks)
+Check idempotency first: every task the repair re-runs must be safe to run twice (MERGE on the full key, AUTO CDC,
+`INSERT OVERWRITE` of a bounded partition or date range; not a plain append). If a task appends, fix that before
+repairing, or delete the partial output in dev first. Then, in a Python cell (dev only):
+```python
+from databricks.sdk import WorkspaceClient
+w = WorkspaceClient()
+run = w.jobs.get_run(run_id)
+failed = [t.task_key for t in run.tasks if t.state and t.state.result_state
+          and t.state.result_state.value not in ("SUCCESS", "EXCLUDED")]
+w.jobs.repair_run(run_id=run_id, rerun_tasks=failed).result()   # or rerun_all_failed_tasks=True
+```
+Verify the output after the repair (SKILL.md step 3): row counts must match a single clean run, not double it.
+
 ## Permission denied
-Write the statements for a human to run (GRANT is Tier 1, never executed by the agent):
+Write the statements for a human to run (GRANT is forbidden to the agent by `instructions/security-guardrails.md`;
+never executed by the agent):
 ```sql
 GRANT USE CATALOG ON CATALOG c TO `<principal>`;
 GRANT USE SCHEMA, CREATE TABLE, MODIFY, SELECT ON SCHEMA c.s TO `<principal>`;

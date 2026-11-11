@@ -26,7 +26,10 @@ You are helping a data engineering team on Databricks. Follow spec-driven develo
 4. Use current product names: Lakeflow Spark Declarative Pipelines (not DLT), AUTO CDC (not APPLY CHANGES),
    Declarative Automation Bundles (not Asset Bundles), Lakeflow Jobs, Lakeflow Connect, Zerobus Ingest, AI Search,
    Genie Agents, Unity Gateway, liquid clustering (not partitioning or ZORDER). Load `de-databricks-current` when unsure.
-5. For product syntax load the official `databricks-core` skill, then the matching `databricks-*` product skill.
+5. For product syntax and mechanics read the matching official `databricks-*` product skill; skip `databricks-core`'s
+   CLI and profile checks inside Genie Code. When a pipeline, job or query fails, errors or is slow, load `de-run-diagnose`.
+   For data models, metric views and Genie readiness load `de-data-modeling`; for ontology, knowledge-graph or
+   "what concepts and relationships are in our data" questions load `de-ontology-design` (advice only, it builds nothing).
 6. Never run DROP, TRUNCATE, mass DELETE, GRANT, REVOKE, ownership changes, `bundle destroy`, or anything against a
    prod target. Deployment to prod is done by a human after a `de-release-gate` GO. Full refresh only in dev with
    the user's explicit agreement. No secrets in code, chat or files; mask PII.

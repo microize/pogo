@@ -1,8 +1,8 @@
 ---
 name: de-run-diagnose
-description: Run, monitor, verify and debug Databricks pipelines and jobs in a bounded loop. Use when the user asks to run a pipeline or job and confirm it worked, a run failed, a Spark error or stack trace is pasted, a pipeline is slow or hanging, output tables look wrong, or PySpark code needs a performance review. Classifies the failure, applies a fix, re-runs at most three times, then escalates, and logs every struggle to .challenges_<email>/. Dev target only unless told otherwise.
+description: Run, monitor, verify and debug Databricks pipelines and jobs in a bounded loop. Use when the user asks to run a pipeline or job and confirm it worked, or says "did my pipeline fail", "my job failed", "why did the run fail", "why is it slow", "the numbers look wrong", "repair the run", or a run failed, a Spark error or stack trace is pasted, a pipeline is slow or hanging, output tables look wrong, or PySpark code needs a performance review. Classifies the failure, applies a fix, re-runs at most three times, then escalates, and logs every struggle to .challenges_<email>/. Dev target only unless told otherwise.
 metadata:
-  version: "0.4.0"
+  version: "0.5.0"
 ---
 
 # de-run-diagnose: run, verify, fix, re-run, escalate
@@ -37,7 +37,10 @@ Never run against `prod` from this skill. If the user names prod, hand to `de-re
 ## 2. Monitor
 
 - Pipelines: `SELECT timestamp, level, event_type, message FROM event_log('<pipeline-id>') WHERE level IN ('ERROR','WARN') ORDER BY timestamp DESC`. Flow progress: `event_type = 'flow_progress'`. System table (Beta): `system.lakeflow_pipeline_events_preview.pipeline_events`.
-- Jobs: `databricks jobs get-run <run_id>` for state and task states, `databricks jobs get-run-output <task_run_id>` for logs.
+- Jobs (Python SDK, `w = WorkspaceClient()`): `w.jobs.get_run(run_id)` for state and task states (each task's
+  `run_id` is the task run id), `w.jobs.get_run_output(task_run_id)` for the error, trace and notebook output. To
+  re-run only failed tasks, `w.jobs.repair_run(...)` after the idempotency check in `references/fix-recipes.md`
+  ("Repair a failed job run"). SDK mechanics: official `databricks-python-sdk/SKILL.md`.
 - Long runs (over 30 minutes or 2x the usual): check whether tasks progress (event log timestamps, Spark UI stages). Stalled with no progress means a diagnose step, not more waiting.
 
 ## 3. Verify output (always, even on SUCCESS)
@@ -103,6 +106,9 @@ When asked to review PySpark or pipeline performance rather than a failure: scan
 `references/anti-pattern-catalog.md`, then check the Databricks-specific list: serverless used, liquid clustering (`CLUSTER BY AUTO`) instead of partitions and Z-ORDER, AQE on (default), broadcast hints for small dimensions, watermarks on stateful streams, no `collect()` / `toPandas()` on large frames, no Python UDF where a native function exists, incremental MV eligibility. Output a prioritized table: finding, impact, fix, effort.
 
 ## Changelog
+- 0.5.0: QA and gap-analysis fixes: job monitoring through the Python SDK (no CLI), repair_run recipe with
+  idempotency check, plain-language triggers, "Tier 1" reworded in fix recipes, anti-pattern catalog defers to the
+  PR rule catalog for PR severity and gains AP-21 (cross join).
 - 0.4.0: workspace-only: Pipelines Editor, SDK, Git folder UI and bundle Deployments panel replace local CLI and CI steps.
 - 0.3.0: PIPE-11/12 and ENV-01..06 from live tests (streaming view, quota, system.access, no compute, metastore root, expired token, display hang).
 - 0.2.0: fixes become task lines; parameters wording; official run mechanics and connector troubleshooting pointers.

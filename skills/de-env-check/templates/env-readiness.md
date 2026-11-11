@@ -19,8 +19,13 @@ environment failure. Goal checked against: <track id, or "general data engineeri
 
 ## Team compute (the only compute the agent may use)
 
-| Resource | Type | Size / policy | Access mode | Auto-stop | Permission |
-|---|---|---|---|---|---|
+| Resource | Type | Size / policy (single-node allowed?) | Access mode | Auto-stop | Owner (creator field) | Permission |
+|---|---|---|---|---|---|---|
+
+## Workspace previews that change designs
+
+| Preview (e.g. multiple triggers per job) | Enabled (yes / no / unknown) | Design consequence |
+|---|---|---|
 
 ## Shared limits
 

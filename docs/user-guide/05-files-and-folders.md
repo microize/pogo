@@ -14,6 +14,7 @@ my-project/
     project-profile.md           platform, owner team, environment index, conventions
     env/<env>-<team>.md          what this environment allows + admin checklist (de-env-check)
     models/<model>/model.md      data model, bus matrix, diagram (de-data-modeling)
+    ontology/<domain>/ontology.md  concepts, properties, relationships (de-ontology-design)
     decisions/ADR-001-*.md       accepted recommendations (de-advisor)
     contracts/<table>.yaml       data contracts (de-data-contract)
     <track_id>/

@@ -2,7 +2,7 @@
 name: de-sdd-implement
 description: Task-by-task implementation of an approved data engineering spec on Databricks. Use when the user says "implement", "next task", "work on T03", "run the approved plan", or replies "approved" after a spec exists. Claims and executes specs/<track_id>/tasks.md one task at a time with verification, records evidence in .internal_<email>/, logs struggles to .challenges_<email>/, and never changes the spec without the user's approval.
 metadata:
-  version: "0.5.0"
+  version: "0.6.0"
 ---
 
 # de-sdd-implement: claim one task, verify, tick, repeat
@@ -36,7 +36,10 @@ If none is eligible because another person holds the dependency, say so and stop
    Git folder, Git folder dialog, admin settings); ask for the result and paste it. A task is never ticked on an
    unverified claim.
 5. **Record** in `progress.md`: task, files, verification command and result numbers, timestamp, commit message if any.
-   Tick `[x]` in `tasks.md` and sync.
+   Evidence names the pipeline update id or job run id it came from; a number without one is not evidence.
+   Optional: the Delta version of each table the task writes, taken before the task (`DESCRIBE HISTORY t LIMIT 1`),
+   so a bad task can be undone with `RESTORE TABLE t TO VERSION AS OF n`, in dev only.
+   Tick `[x]` in `tasks.md`, update this track's status and done count in `.internal_<email>/index.md`, and sync.
 6. **Commit** when in a Git folder: user-run in the Git folder dialog > **Commit & Push** with message
    `feat(<track_id>): T03 <title>`; review the diff there first.
 7. **Hand the task to the human** with a **Validate** block, then wait (see "Autopilot"). Tick only after the human's
@@ -58,6 +61,8 @@ run the tasks **back to back** without waiting for `next`:
   stop only for a decision, an amendment, a user-run step, a failure after three fix cycles, or the end.
 - **Errors fix themselves first**: a failed verification or run goes to `de-run-diagnose` (classify, add a
   `T<nn>-fix` line, fix, re-run) for up to three cycles before asking the human; every cycle is a challenge entry.
+  After three failed fixes of the same problem, do not try a fourth: propose a spec amendment or ask the design
+  question behind it.
 - **Fewer user-run steps**: batch them (one Deployments-panel deploy to `dev` for several tasks), and in the **dev** target
   point the pipeline `libraries` / `root_path` at the project folder's absolute workspace path so you can edit
   files and run updates with the SDK (`WorkspaceClient().pipelines.start_update`) without redeploying. Prod always
@@ -73,7 +78,13 @@ run the tasks **back to back** without waiting for `next`:
   history (`system.query.history` or the Query History page) before calling it failed; a stopped display is not a
   cancelled query. Say what you found.
 - Cost: pre-check SQL on the warehouse before starting classic compute; small data until the "full data" phase;
-  one update per verification, not one per edit.
+  one update per verification, not one per edit. Agent turns and SQL warehouse time are usually the biggest build
+  cost, not job compute, so: combine a task's checks into one count-only query where possible (one row of counts, no
+  sample rows); ask the user one batched message per task, not one question at a time; do not re-read a file whose
+  save was just confirmed.
+- **Uncommitted work before a job run** (Git folder): if earlier ticked tasks are not committed, say so in the run
+  request: "T03 to T05 are not committed. Commit & Push first, or reply `run uncommitted`." Record the reply in
+  `progress.md`.
 - Finish: when the last task is ticked, run every acceptance criterion, show a final Validate table, and set
   `Status: COMPLETE` only after the human's OK.
 
@@ -89,12 +100,22 @@ permission, compute or quota error blocks you.
 1. Challenge entry through `de-sdd-tracking` (attempts, redacted error, cause, resolution or `OPEN`, lesson).
 2. Mark `[!]` if still blocked, name what you need (grant, secret, decision).
 3. Never narrow the spec silently to make a task pass.
+4. A cluster policy, permission or quota rejects an action: stop and report the error with options (who can grant,
+   a smaller size, another compute). Never work around it, for example by dropping the policy and resubmitting.
 
 ## When the spec is wrong
 
 Stop. One paragraph on the mismatch and the proposed amendment. Wait for `approved`. Major amendments (keys, grain,
 SCD type, sequence column, schedule, targets) also need a goldfish re-review of the diff (`de-sdd-spec`,
 "Amendments"). Then version bump, Decision Log row, `tasks.md` adjusted, continue.
+Any deviation, even an additive one (an extra column, an extra config column), is a Minor amendment row in the
+spec's Decision Log, not only a line in chat or `progress.md`.
+
+## Write-audit-publish (when a target must never show bad data)
+
+Write the new data to a staging table, run the blocking checks on it, then `MERGE` into the target only when they
+pass. Keep one runbook line for the target: `RESTORE TABLE t TO VERSION AS OF n`, with the version recorded before
+the publish. Do not use multi-statement transactions (`BEGIN ATOMIC`) for this.
 
 ## Fixes found while running (de-run-diagnose)
 
@@ -104,15 +125,17 @@ it, then edit. No edits without a task line.
 ## Guardrails
 
 `instructions/security-guardrails.md` applies: dev target only; no destroy, deploy or full refresh on non-dev;
-no DROP / TRUNCATE / GRANT; secrets in secret scopes. Prod deployment is a human step after `de-release-gate`.
+no DROP / TRUNCATE / GRANT / REVOKE; secrets in secret scopes. Prod deployment is a human step after `de-release-gate`.
 
 ## Done
 
 All tasks `[x]`, acceptance criteria recorded with results in `progress.md`, `tasks.md` header `Status: COMPLETE`,
-spec header `Status: COMPLETE`, index updated. Offer a review pass: list any spec-to-code gap as new tasks under
-"Review fixes" and wait for the user's go.
+spec header `Status: COMPLETE`, index updated. Before setting COMPLETE, show one list: spec items not met, and
+anything built that the spec did not request (each with its Decision Log row, or "none"). Offer a review pass: list
+any spec-to-code gap as new tasks under "Review fixes" and wait for the user's go.
 
 ## Changelog
+- 0.6.0: QA and gap-analysis fixes: cost-aware checks and batched questions, stop on policy / permission / quota rejection, uncommitted-work note before job runs, tick updates index.md, additive deviations are Minor amendments, update / run id as evidence, no fourth fix, optional table version before task, Done lists unmet and unrequested items, REVOKE in guardrails, write-audit-publish note.
 - 0.5.0: workspace-only: Git folder UI and bundle Deployments panel replace local CLI and CI steps.
 - 0.4.0: budget per track, dry-run before the first real update of a new dataset, stuck-step check via query history.
 - 0.3.0: autopilot after approval (tasks back to back, Validate block per task, `auto` mode, self-fix via de-run-diagnose, dev SDK iteration without redeploy, cost pre-checks), from the live autonomy test.

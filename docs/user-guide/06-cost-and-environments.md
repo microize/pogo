@@ -8,7 +8,10 @@ differ a lot: dev may have no serverless compute while prod has it, or the other
 - The agent checks one workspace at a time (the one you are in). Each check is saved as `specs/env/<env>-<team>.md`.
 - It never assumes prod looks like dev. To check another workspace, someone with access opens Genie Code **in that
   workspace** and runs the readiness check there; until then the file marks it as not checked.
-- Each bundle target (`dev`, `prod`) must point at the right workspace host. The checks flag a target that does not.
+- Each bundle target (`dev`, `prod`, and `staging` if used) must point at the right workspace host. The checks flag a
+  target that does not.
+- Deploying a bundle from the **Deployments** panel needs serverless in that workspace. Without it, the agent creates
+  **dev** jobs through the Jobs API with your approval (jobs in other environments are created by a person) and records this in the spec.
 
 ## Teams sharing a workspace
 
@@ -34,6 +37,10 @@ job, so start-up was most of the cost.
 
 Example from our test (East US 2, list price): the daily medallion pipeline on 2 D4ds_v4 nodes costs about 0.22 USD per
 run, about 6.60 USD a month; keeping it running all the time would cost about 921 USD a month.
+
+While you build, agent turns and SQL warehouse time are usually most of the cost, more than the pipeline runs. To keep
+it down: set the warehouse auto-stop low (a few minutes), ask the agent to batch its checks into fewer queries, and
+attach your own compute to the notebook you chat from.
 
 Things to know:
 

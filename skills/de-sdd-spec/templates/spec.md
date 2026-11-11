@@ -113,8 +113,16 @@ Every KPI, measure or business question from the request maps to a deliverable. 
 | # | Check | Command / query | Expected |
 |---|---|---|---|
 | AC1 | Row count matches source | `SELECT count(*) FROM ... WHERE __END_AT IS NULL` | equals source current count |
-| AC2 | No duplicate current rows | `SELECT order_id, count(*) ... HAVING count(*) > 1` | 0 rows |
+| AC2 | One current row per key (SCD2 targets; else one row per key) | `SELECT order_id, count(*) ... WHERE __END_AT IS NULL GROUP BY order_id HAVING count(*) > 1` | 0 rows |
 | AC3 | Bundle deploys to dev | user-run: Deployments panel > deploy target `dev` (deploy validates first) | deployment succeeds |
+| AC4 | Re-run gives the same result | run twice on the same input; compare `count(*)` and a column checksum per target | identical |
+| AC5 | No rows lost (where a quarantine exists) | `count(bronze)` vs `count(silver) + count(quarantine)` for the same load | equal |
+## 15b. Unchanged behaviour (hotfix tracks)
+
+What the fix must not change, each with a query run before and after the fix.
+
+| # | Behaviour | Query | Before | After |
+|---|---|---|---|---|
 
 ## 16. Decision log
 

@@ -1,6 +1,8 @@
 # genie-de-skills
 
 Spec-driven data engineering skills for **Databricks Genie Code**, used **inside the Databricks workspace only**.
+The goal: reliable pipelines, and data that people and AI can understand and use, through a semantic layer
+(metric views, keys, comments, Genie Agents) and ontology / knowledge-graph design built on the data in Unity Catalog.
 Every step (install, specs, build, test, commit, deploy) is done in the workspace: Genie Code in agent mode, notebooks,
 the SQL editor, the Lakeflow Pipelines Editor, Git folders and the bundle Deployments panel. No laptop, local CLI or
 CI is needed. Each skill follows the open [Agent Skills](https://agentskills.io) standard: a folder with a `SKILL.md`
@@ -10,12 +12,13 @@ whose frontmatter has `name` and `description`.
 
 | Path | What it is |
 |---|---|
-| `skills/de-*/` | the 13 skills |
+| `skills/de-*/` | the 14 skills |
 | `install/install_skills.py` | notebook that publishes the skills to the workspace and verifies them |
 | `install/official/` | 16 official `databricks-*` skills, vendored unmodified at the pinned release, with their license |
 | `AGENTS.md` | the method's rules and routing, copied into each project folder |
 | `instructions/` | conventions, security guardrails, waivers, and paste-ready Genie Code instructions |
 | `docs/user-guide/` | the guide for engineers |
+| `docs/maintainers/` | for kit maintainers: skill trigger tests (prompts that should and should not load each skill) |
 | `backup/` | local zips of earlier versions (git-ignored, not published) |
 
 Scope: ETL / ELT, data warehouse, lakehouse (medallion), CDC and SCD pipelines on Databricks.
@@ -65,6 +68,7 @@ Any time:
 | `de-cost` | cost and run-time per option from a dated Azure price file (refresh script: Retail Prices API + calculator feed) | quote negotiated prices |
 | `de-env-check` | workspace readiness: compute per workload, quota signals, Unity Catalog, system tables, tooling; admin checklist | change settings, grants or clusters |
 | `de-data-modeling` | bus matrix, grain, dimensions, logical and physical model, Mermaid diagram, validation queries, review | write pipeline code |
+| `de-ontology-design` | concepts, properties, relationships, vocabularies and identity proposed from Unity Catalog data, with evidence; competency-question coverage; optional OWL / LinkML text | build the knowledge graph or change data |
 | `de-databricks-current` | current Databricks names (old to new), DE design patterns, pointers to the official `databricks-*` skills | replace the official product skills |
 | `de-data-contract` | versioned data contracts (`specs/contracts/*.yaml`) and change impact reports from Unity Catalog lineage | alter tables |
 | `de-quality-testing` | DQ rule table with severity, enforced as pipeline expectations plus post-load SQL; unit and pipeline tests under `tests/` | design tables, run pipelines |
@@ -73,8 +77,8 @@ Any time:
 
 The official Databricks skills (`databricks-pipelines`, `databricks-dabs`, `databricks-jobs`,
 `databricks-zerobus-ingest`, `databricks-lakeflow-connect`, ...) from
-https://github.com/databricks/databricks-agent-skills hold the product syntax. These skills sit on top of
-them and route to them. Install both.
+https://github.com/databricks/databricks-agent-skills hold the product syntax and mechanics, and the agent uses them freely. These skills sit on top of them, govern the
+process (spec, approval, tasks, gates) and route to them. Install both.
 
 ### Overlap check against the official skills (pinned)
 
@@ -93,10 +97,10 @@ AUTO CDC, expectations, SCD2 querying, performance, running a pipeline), `databr
 
 ### Core method vs supporting skills
 
-The package has **13 skills**. Six are the method: `de-sdd-spec`, `de-goldfish-review`, `de-sdd-implement`,
-`de-sdd-tracking`, `de-advisor`, `de-databricks-current`. Seven support it at the right task: `de-data-contract`,
-`de-quality-testing`, `de-run-diagnose`, `de-release-gate`, `de-data-modeling`, `de-env-check`, `de-cost`.
-Install all 13; the install notebook installs them together with the official skills and expects `29 ok, 0 failed`.
+The package has **14 skills**. Six are the method: `de-sdd-spec`, `de-goldfish-review`, `de-sdd-implement`,
+`de-sdd-tracking`, `de-advisor`, `de-databricks-current`. Eight support it at the right task: `de-data-contract`,
+`de-quality-testing`, `de-run-diagnose`, `de-release-gate`, `de-data-modeling`, `de-ontology-design`, `de-env-check`,
+`de-cost`. Install all 14; the install notebook installs them together with the official skills and expects `30 ok, 0 failed`.
 
 ## Install (in the workspace)
 
@@ -106,10 +110,10 @@ Genie Code discovers skills in `/Users/<your-email>/.assistant/skills/` (persona
 1. Create a **Git folder** of this repo: Workspace > Create > Git folder, paste the repo URL.
 2. Open the notebook `install/install_skills` in it and attach serverless compute.
 3. Set the widget `scope`: `personal` (just you) or `workspace` (admin; also writes
-   `/Workspace/.assistant_workspace_instructions.md` from `instructions/genie-code-user-instructions.md` and a
-   `_VERSION` stamp). `include_official` = `yes` (default) also installs the official skills. Optional
+   `/Workspace/.assistant_workspace_instructions.md` from `instructions/genie-code-user-instructions.md`). Both scopes
+   write a `_VERSION` stamp next to the skills. `include_official` = `yes` (default) also installs the official skills. Optional
    `dry_run` = `yes` shows what would change. Run all.
-4. The last cell prints `29 ok, 0 failed`. Start a **new** Genie Code chat in agent mode (hard-refresh the browser if
+4. The last cell prints `30 ok, 0 failed`. Start a **new** Genie Code chat in agent mode (hard-refresh the browser if
    the skills do not appear). Skills load by description, or mention them with `@de-sdd-spec`.
 
 To update: pull in the Git folder dialog, re-run the notebook.
@@ -126,13 +130,14 @@ to GitHub: `databricks-core`, `-pipelines`, `-dabs`, `-jobs`, `-unity-catalog`, 
 
 **Project folders.** Copy `AGENTS.md` and `instructions/` into the root of each project's Git folder where the method
 should apply. Genie Code walks up the folder tree from the open file and injects any `AGENTS.md` it finds.
-Instruction files are capped at 20,000 characters.
+Instruction files are capped at 20,000 characters; the install notebook warns when one is over.
 
 **How work runs.** On serverless the `databricks` CLI is not installed, and the method does not need it. Genie Code
 runs SQL, the Python SDK (`WorkspaceClient`), the Pipelines Editor and notebook-cell `pytest` itself
 (`in-workspace:` checks). You do the UI-only steps (`user-run:`): pull, diff and **Commit & Push** in the Git folder
 dialog, and bundle deploys from the Git folder's **Deployments panel** (Public Preview; it deploys only to targets in
 the same workspace, so prod is deployed from the prod workspace's Git folder, by a human, after a release-gate GO).
+The panel needs serverless; without it the agent creates dev jobs through the Jobs API with your approval.
 
 ## Where the method comes from
 

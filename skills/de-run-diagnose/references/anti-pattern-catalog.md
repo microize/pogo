@@ -2,6 +2,8 @@
 
 Items marked (updated) changed because of liquid clustering,
 AUTO CDC and serverless. Severity uses the package scale: Blocker (was Critical), Major (was High), Minor (was Medium or Low).
+Severities here are for performance review. In a PR review, `de-release-gate/references/pr-rule-catalog.md` decides
+and may be stricter (for example AP-13 and cross joins are Blockers there, AP-16 is Advisory = Major).
 
 | Id | Anti-pattern | Severity | Fix |
 |---|---|---|---|
@@ -25,6 +27,7 @@ AUTO CDC and serverless. Severity uses the package scale: Blocker (was Critical)
 | AP-18 (updated) | `spark.conf.set` cluster tuning in pipeline code | Minor | not applied on serverless; use pipeline configuration or fix the query |
 | AP-19 | stateful stream without watermark | Blocker | `withWatermark` on every aggregation or stream-stream join |
 | AP-20 | `spark.sql(f"... {user_input} ...")` | Blocker | parameter markers or DataFrame API |
+| AP-21 | cross join (or join with no or always-true condition) without a comment justifying it | Major (Blocker in PR review) | add the join key; if intended, comment why and bound the small side |
 
 ## Join checklist
 - Broadcast dimensions under about 100 MB; let AQE handle the rest.

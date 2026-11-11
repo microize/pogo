@@ -13,9 +13,9 @@
 
 ## Task log
 
-| Date | Task | Status | Files | Verification (command and result) | Commit |
-|---|---|---|---|---|---|
-| | T01 | [x] | `databricks.yml` | Deployments panel deploy to `dev` succeeded | abc1234 |
+| Date | Task | Status | Files | Verification (command, update or run id, result) | Table version before (optional) | Commit |
+|---|---|---|---|---|---|---|
+| | T01 | [x] | `databricks.yml` | Deployments panel deploy to `dev` succeeded | - | abc1234 |
 
 ## Decisions taken while implementing (not spec changes)
 

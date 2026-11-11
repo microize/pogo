@@ -1,7 +1,8 @@
 # AGENTS.md: data engineering on Databricks, spec-driven
 
 This project uses **spec-driven development (SDD)** for data engineering changes (ETL / ELT, warehouse models,
-CDC / SCD pipelines, ingestion, jobs). Read this before acting. Package version: see `/Workspace/.assistant/skills/_VERSION`.
+CDC / SCD pipelines, ingestion, jobs) and for making that data understandable to people and AI: semantic layer
+(metric views, keys, comments, Genie Agents) and ontology / knowledge-graph design. Read this before acting. Package version: `_VERSION` in the installed skills folder.
 
 ## Non-negotiable rules
 
@@ -15,8 +16,8 @@ CDC / SCD pipelines, ingestion, jobs). Read this before acting. Package version:
    spec but the same gate. A syntax example shown **in chat only**, labelled as an example and written to no file,
    is not project code and is allowed.
 2. **Precedence.** If an official `databricks-*` skill and `de-sdd-spec` both apply and no approved spec exists,
-   `de-sdd-spec` wins; the official skill is read for syntax only. Inside Genie Code skip `databricks-core`'s CLI
-   floor check and profile selection; open the product skill's `references/*.md` directly.
+   `de-sdd-spec` governs the process; official skills are welcome for syntax and mechanics. Inside Genie Code skip
+   `databricks-core`'s CLI floor check and profile selection; open the product skill's `references/*.md` directly.
 3. **One task at a time**, claimed with `(owner: <email>)` in `specs/<track_id>/tasks.md`, dependencies satisfied,
    synced per the project's topology (Git folder Commit & Push, plain-folder re-open, or the Unity Catalog events
    table). Verified before ticked: `in-workspace:` checks you run; `user-run:` checks the user does in the workspace UI
@@ -49,7 +50,7 @@ it. Full map and design patterns: `de-databricks-current`.
 | `apply_changes_from_snapshot` | `create_auto_cdc_from_snapshot_flow` |
 | `stored_as_scd_type="2"` | `stored_as_scd_type=2` (integer); SQL `STORED AS SCD TYPE 2` |
 | `LIVE.` prefix | plain dataset name |
-| `CREATE LIVE VIEW` read with `STREAM(...)` | a streaming view (`CREATE STREAMING LIVE VIEW` passed in the live test; check `databricks-pipelines` SQL reference) |
+| `CREATE LIVE VIEW` read with `STREAM(...)` | `CREATE TEMPORARY VIEW v AS SELECT ... FROM STREAM(src)`; downstream reads `FROM STREAM(v)` (`databricks-pipelines` temporary-view-sql reference) |
 | `partition_cols`, `PARTITIONED BY`, `ZORDER` on new tables | `cluster_by`, `CLUSTER BY AUTO` (liquid clustering) |
 | Databricks Asset Bundles (DABs) | Declarative Automation Bundles (file still `databricks.yml`) |
 | Workflows | Lakeflow Jobs |
@@ -78,7 +79,8 @@ to back, self-fix with `de-run-diagnose`, a Validate block per task, tick on the
 | "advise", "advisor mode", "should we use X or Y", "which service", "review this architecture" | `de-advisor` |
 | "check the environment", "workspace readiness", "what compute do I have", quota / no compute / privilege errors | `de-env-check` |
 | "how much will it cost", "cheapest", "serverless or classic", "cost vs speed", "refresh prices" | `de-cost` |
-| "data model", "star schema", "bus matrix", "conformed dimension", "grain", "ERD", "model review" | `de-data-modeling` |
+| "data model", "star schema", "bus matrix", "conformed dimension", "Data Vault", "grain", "ERD", "model review", "metric views", "semantic layer", "Genie on gold" | `de-data-modeling` |
+| "ontology", "knowledge graph design", "concepts / properties / relationships in our data", "glossary terms" | `de-ontology-design` |
 | "data contract", "schema change", "what breaks downstream", "impact" | `de-data-contract` |
 | "DQ rules", "expectations", "quarantine", "unit tests for the transformation" | `de-quality-testing` |
 | "run the pipeline", "it failed", a stack trace, "slow", "wrong numbers", "performance review" | `de-run-diagnose` |
@@ -104,6 +106,8 @@ Everything happens inside the Databricks workspace; nothing in this method needs
 - The user does in the workspace UI (`user-run:`): pull, diff and **Commit & Push** in the Git folder dialog; deploy a
   bundle target from the Git folder's **Deployments panel** (Public Preview; only targets in the same workspace, so
   prod is deployed from the prod workspace); admin settings. Say which you are using.
+- Read and edit project files with the file tools and do arithmetic in the reply; never run shell or Python cells for
+  these (they run on whatever cluster the notebook is attached to).
 - Genie Code has **no custom sub-agents, hooks or slash commands**: roles are skills; the goldfish runs in a new chat.
 - The official `databricks-*` skills must be installed in the same `.assistant/skills` folder. This repo's
   `install/install_skills` notebook installs both: the `de-*` skills and the vendored official skills in
@@ -112,7 +116,7 @@ Everything happens inside the Databricks workspace; nothing in this method needs
 ## Project conventions (the lead fills this in; everything else is in `instructions/`)
 
 - Catalogs: dev `dev_<user>`, staging `<name>`, prod `<name>`. Schemas: `<layer>_<domain>`.
-- Pipeline language: SQL | Python (project choice). Compute: serverless. Deployment: bundles with `dev` and `prod` targets, deployed from each workspace's Git folder Deployments panel.
+- Pipeline language: SQL | Python (project choice). Compute: serverless. Deployment: bundles with `dev` and `prod` targets (add `staging` if used), deployed from each workspace's Git folder Deployments panel (needs serverless; without it the agent creates **dev** jobs via the Jobs API / SDK, recorded in the spec; non-dev jobs are user-run).
 - Topology for shared files: git-folder | plain-folder | org-events (`<catalog>.sdd.task_events`). Email folder style: literal | `_at_`.
 - Ledger retention: 12 months. Ledgers are auditable evidence and lesson sources, not performance ratings; anyone may ask the lead to git-ignore their challenges file.
 - Commits: `feat(<track_id>): T03 <title>`; `docs(<track_id>): spec approved`.

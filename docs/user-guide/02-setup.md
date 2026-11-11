@@ -14,7 +14,7 @@ Done by a workspace admin.
      `/Workspace/.assistant/skills/` (visible to every user; no internet access needed),
    - writes `/Workspace/.assistant_workspace_instructions.md` from `instructions/genie-code-user-instructions.md`,
    - writes a `_VERSION` stamp next to the skills,
-   - checks each installed skill against the Git folder and prints `29 ok, 0 failed` (13 + 16).
+   - checks each installed skill against the Git folder and prints `30 ok, 0 failed` (14 + 16).
 3. Open any notebook, open Genie Code, start a **new** chat and type `@de-`. You should see the `de-*` skills in the list.
 
 To update later: pull the kit's Git folder (Git dialog > **Pull**) and run `install/install_skills` again.
@@ -45,13 +45,15 @@ Only want to try it yourself first? Any user can run the same notebook with `sco
 3. Read [Everyday use](04-everyday-use.md) once.
 
 That is all. The steps you do yourself (pull, commit and push, deploy a bundle to dev) are buttons in the workspace.
+Deploying from the Git folder's **Deployments** panel needs serverless compute; without it, the agent creates the dev
+jobs through the Jobs API (Python SDK) after you approve each call, and the spec records that choice.
 
 ## How to know setup is complete
 
 | Check | Where | Expected |
 |---|---|---|
-| Skills visible | new Genie Code chat, type `@de-` | 13 `de-*` skills listed |
-| Install verified | last cell of `install/install_skills` | `29 ok, 0 failed` |
+| Skills visible | new Genie Code chat, type `@de-` | 14 `de-*` skills listed |
+| Install verified | last cell of `install/install_skills` | `30 ok, 0 failed` |
 | Project rules read | ask "what are the rules of this project?" in a chat opened from a project file | it quotes AGENTS.md |
 | Environment known | `specs/env/` in the project | a file for your environment and team, no Blocking items for your goal |
 | Git works | Git dialog of the project folder | your branch, **Pull** succeeds |

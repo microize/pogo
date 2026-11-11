@@ -2,7 +2,7 @@
 name: de-quality-testing
 description: Data quality rules and tests for Databricks pipelines. Use when the user asks for DQ rules, expectations, validation, duplicate or freshness checks, schema drift detection, quarantine, Data Profiling (formerly Lakehouse Monitoring), or unit tests for pipeline / PySpark / SQL transformation code. Produces a severity-classified rule table (as Lakeflow pipeline expectations plus post-load SQL checks) and runnable tests under tests/. Tests data properties and code logic; does not design tables or run pipelines.
 metadata:
-  version: "0.4.0"
+  version: "0.6.0"
 ---
 
 # de-quality-testing: rules for the data, tests for the code
@@ -31,7 +31,7 @@ Read the spec (targets, grain, keys, section 7) and the contract if one exists. 
 | SCH-01 | bronze.orders | schema | no `_rescued_data` rows above 0.1 percent | Warning | `expect` |
 | THR-01 | silver.orders | volume | daily rows within 30-day band | Warning | Data Profiling (formerly Lakehouse Monitoring) or SQL alert |
 
-Id prefixes: CMP, UNQ, RNG, REF, FRS, SCH, THR. Severity maps to action: Critical = fail the update or page; Warning = drop or quarantine and notify; Low = log.
+Id prefixes: CMP, UNQ, RNG, REF, FRS, SCH, THR, SLA. Severity maps to action: Critical = fail the update or page; Warning = drop or quarantine and notify; Low = log.
 
 ### 3. Enforce on Databricks (write as tasks)
 
@@ -47,9 +47,21 @@ Id prefixes: CMP, UNQ, RNG, REF, FRS, SCH, THR. Severity maps to action: Critica
 - **Table-level**: `NOT NULL` and `CHECK` constraints for invariants; UC PK / FK for documentation and optimizer hints only.
 - **Post-load SQL** for uniqueness at grain, referential integrity, reconciliation against source counts. Put the queries in `tests/dq/<table>.sql` and run them as a job task after the pipeline, failing the task on violations.
 - **Trend and drift**: Data Profiling (formerly Lakehouse Monitoring; official `databricks-unity-catalog/references/7-data-profiling.md`) or SQL alerts on saved queries; thresholds start at 2 sigma over a 30-day baseline, tighter for gold.
+- **Run-health baseline (every scheduled pipeline or job, in the spec by default)**: three monitors, each notifying a
+  team channel, not a person:
+  1. *No new data*: a SQL alert when the landing or bronze table received no rows in the expected window (e.g. no
+     file for today's date by a set hour). This catches a silent upstream stop that a "job succeeded" status hides;
+     it is separate from FRS (freshness of the processed table).
+  2. *Volume shift*: THR rule on daily rows (drop or spike beyond the band) on bronze and gold; on a new table start
+     with a fixed band until 30 days of history exist.
+  3. *Too slow*: job `health` rule `RUN_DURATION_SECONDS` set from the measured run time plus margin, with
+     `on_duration_warning_threshold_exceeded` notifications and a `timeout_seconds` above it; streaming jobs add
+     `STREAMING_BACKLOG_SECONDS`. Syntax: official `databricks-jobs/references/examples.md` (health monitoring).
+  Ids: FRS for no new data, THR for volume, SLA for duration (add `SLA` to the prefixes).
 
 Write post-load checks from `templates/dq-checks.sql` (one pass/fail row per rule, catalog as a variable, no row
-values) and fixture tests for SQL pipelines with `references/sql-fixture-pattern.md` (synthetic files in a separate
+values). Always include the pipeline invariants it carries: run twice gives the same result (idempotency), bronze
+rows = silver valid + quarantined, one current row per key on SCD2 targets (`__END_AT IS NULL`). Write fixture tests for SQL pipelines with `references/sql-fixture-pattern.md` (synthetic files in a separate
 test volume, a dev bundle target writing to separate schemas, expected results per case).
 
 ### 4. Hand back
@@ -63,7 +75,8 @@ and `databricks-jobs` (pyproject, `tests/`); in Genie Code tests run in a notebo
 to write, where Spark tests must run, and the Databricks-safe session rules.
 
 ### Where tests run
-- **Pipeline unit tests** (Lakeflow Pipelines Editor, Python, Beta): mock source data, assert flow outputs. Use when the project is an SDP pipeline. Verify availability first; it is Beta.
+- **Pipeline unit tests** (Lakeflow Pipelines Editor, Python): optional, if available (Beta). Mock source data,
+  assert flow outputs. Verify availability first; the default path is pytest below.
 - **pytest in a notebook cell** for transformation functions factored out of flows and for pure-Python helpers: run
   `pytest.main(["-q", "--assert=plain", "-p", "no:cacheprovider", "/Workspace/.../tests/unit"])` in a notebook cell on
   serverless (or the team's cluster), from the project's Git folder.
@@ -75,6 +88,8 @@ to write, where Spark tests must run, and the Databricks-safe session rules.
 - `SparkSession.builder.getOrCreate()` only; never `.master("local[*]")`, never `spark.stop()`.
 - Guard Spark tests with `pytest.importorskip("pyspark")` or `@pytest.mark.skipif(spark is None, ...)`.
 - No real I/O: mock cloud reads, JDBC, HTTP, env vars; build inputs with `spark.createDataFrame`.
+- Compare DataFrames with `pyspark.testing.assertDataFrameEqual(actual, expected)` (and `assertSchemaEqual` for
+  schemas) instead of collecting rows by hand.
 - Pytest flags when running from a workspace path: `--assert=plain -p no:cacheprovider --cache-dir=/tmp/pytest_cache` (workspace paths can be read-only for `__pycache__`); write reports to `/tmp`.
 
 ### Test layout
@@ -91,6 +106,9 @@ Minimum per public function: one happy path, one schema assertion (columns and t
 Tests are not done until they ran. Paste the pass / fail summary into `progress.md`. A failing test with no fix is a challenge entry, not a skipped step.
 
 ## Changelog
+- 0.6.0: run-health baseline by default: no-new-data alert, volume band, job duration health rule (SLA prefix).
+- 0.5.0: QA and gap-analysis fixes: `_source_file_mtime` defined in dq-checks.sql, invariant checks (idempotency,
+  bronze = silver + quarantine, one current row per key), `assertDataFrameEqual`, editor unit tests optional (Beta).
 - 0.4.0: workspace-only: Pipelines Editor, SDK, Git folder UI and bundle Deployments panel replace local CLI and CI steps.
 - 0.3.0: dq-checks.sql template and SQL pipeline fixture pattern.
 - 0.2.0: precondition; aggregate expectations via private MV per official pattern; Data Profiling name; in-workspace pytest.

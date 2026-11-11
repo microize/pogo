@@ -22,6 +22,7 @@ You never have to call them by name. This table only helps you understand what y
 | `de-sdd-tracking` | Keeps the records: who claimed which task, progress, problems met, status, handover. |
 | `de-goldfish-review` | A second opinion on a spec, run in a **new** chat so it has no memory of the first one. |
 | `de-data-modeling` | Designs or reviews the data model (facts, dimensions, keys, diagram). For modellers. |
+| `de-ontology-design` | Proposes which concepts, properties and relationships your data can support for an ontology or knowledge graph, with evidence. Does not build the graph. |
 | `de-env-check` | Finds out what your workspace can run (compute, quota, permissions) and lists what the admin must fix. |
 | `de-cost` | Estimates cost and run time of options from a dated Azure price list. |
 | `de-advisor` | Recommends the best option for a need, in your environment, with cost and time. Read-only. |

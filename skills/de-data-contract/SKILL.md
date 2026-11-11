@@ -1,8 +1,8 @@
 ---
 name: de-data-contract
-description: Data contracts and change impact for Databricks tables. Use when the user asks to define or version a data contract (schema, keys, nullability, CDC strategy, SLA, owners, consumers) for a table, or to assess the impact of a schema or logic change (breaking or not, blast radius via Unity Catalog lineage, migration and rollback plan). Writes specs/contracts/<table>.yaml and specs/<track_id>/impact_<n>.md. Does not change tables.
+description: Data contracts and change impact for Databricks tables. Use when the user asks to define or version a data contract (schema, keys, nullability, CDC strategy, SLA, owners, consumers) for a table, or to assess the impact of a schema or logic change (breaking or not, blast radius via Unity Catalog lineage, migration and rollback plan). Writes specs/contracts/<catalog>.<schema>.<table>.yaml and specs/<track_id>/impact_<n>.md. Does not change tables.
 metadata:
-  version: "0.3.0"
+  version: "0.5.0"
 ---
 
 # de-data-contract: define the contract, assess the change
@@ -66,6 +66,9 @@ Output: `specs/<track_id>/impact_<n>.md` from `templates/impact-report.md`.
 - Keep contracts next to specs so a goldfish review can read them.
 
 ## Changelog
+- 0.5.0: metric-view changes in the breaking-change catalog (rename, expression or filter change, synonyms).
+- 0.4.0: QA and gap-analysis fixes: contract path in the description matches the template, "Genie Agent" in the
+  impact report, forward-only change row in the breaking-change catalog.
 - 0.3.0: documented lineage fallback when system.access is missing; owner team required.
 - 0.2.0: precondition; lineage query aligned with the official reference.
 - 0.1.0: initial.

@@ -10,6 +10,10 @@ Shared by `de-data-contract` (both modes) and `de-release-gate`.
 | Add non-nullable column | **Yes** | Backfill then `SET NOT NULL` | High | `ALTER TABLE ... ALTER COLUMN ... SET NOT NULL` fails if NULLs exist |
 | Remove column | **Yes** | Consumer code update | High | needs column mapping (`delta.columnMapping.mode = name`); data stays until VACUUM |
 | Rename column | **Yes** | Alias view or consumer update | High | column mapping required; lineage shows old name in history |
+| Metric view: rename or remove a measure or dimension | **Yes** | keep the old name as an alias field for one release, then remove | High | dashboards, Genie Agents and saved queries reference fields by name; no table schema changes, so lineage alone will not show it |
+| Metric view: change a measure's expression, filter or source join | **Yes** (results change) | new measure name, or announce with before/after numbers | High | the same KPI name returning different numbers is the costliest silent break; reconcile old vs new for one period |
+| Metric view: add a measure, dimension or synonym | No | None | Low | update Genie benchmark questions if they cover it |
+| Metric view: remove a synonym or change a display name | No (minor) | Note in the changelog | Low | Genie answers to that wording may change; re-run the benchmark questions |
 | Widen type (INT to BIGINT, DECIMAL scale up) | No | Validate downstream casts | Medium | Delta type widening supported; enable `delta.enableTypeWidening` |
 | Narrow type | **Yes** | Rewrite | Critical | data loss risk |
 | Change key columns | **Yes** | Re-key and reprocess; AUTO CDC target needs full refresh | Critical | |
@@ -24,6 +28,7 @@ Shared by `de-data-contract` (both modes) and `de-release-gate`.
 | Change grain of a gold table | **Yes** | New table, deprecate old | Critical | every consumer aggregation changes |
 | Change time zone semantics of a timestamp | **Yes** | Backfill | High | document in contract |
 | Change refresh schedule / SLA | Depends | Notify consumers | Medium | freshness contract clause |
+| Forward-only logic change (new rule applies to new rows only, history not reprocessed) | **Yes** for consumers comparing across the cutover | Record the cutover date in the contract, or backfill | Medium | streaming tables and AUTO CDC process only new data unless a backfill or full refresh runs |
 
 ## Versioning
 

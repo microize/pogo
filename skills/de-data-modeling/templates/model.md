@@ -33,6 +33,16 @@ Catalog: `${catalog}` (dev value <catalog>) | Related track: <track id or none>
 | Table | Layer | Dataset type | Columns (type, null) | Constraints | Clustering | PII |
 |---|---|---|---|---|---|---|
 
+## 6b. Semantic hand-off
+
+| Asset (metric view / table) | Measures or columns | Synonyms (max 10 per field) | Comment reviewed | Keys (PK / FK, RELY after checks) | Domain / tags | Certify at release |
+|---|---|---|---|---|---|---|
+
+Genie Agent (if a consumer): tables or metric views (about 5 max), join relationships without an FK, example SQL.
+
+| Benchmark question | Expected SQL | Expected result shape |
+|---|---|---|
+
 ## 7. Diagram
 
 ```mermaid

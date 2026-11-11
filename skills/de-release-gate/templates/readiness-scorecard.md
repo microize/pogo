@@ -18,6 +18,8 @@
 | Data quality gate | | |
 | SLA and schedule | | |
 | Observability | | |
+| Semantic and Genie readiness | | |
+| Full-refresh protection | | |
 | Rollback | | |
 | Tests | | |
 | Operations | | |

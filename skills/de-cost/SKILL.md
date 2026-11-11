@@ -1,8 +1,8 @@
 ---
 name: de-cost
-description: Cost and run-time estimates for Databricks on Azure. Use when the user asks "how much will this cost", "cheapest option", "serverless or classic", "which warehouse size", "cost vs speed", "monthly cost of this pipeline or job", "refresh prices", "update the price file", or when de-advisor or de-sdd-spec needs a cost comparison. Computes from a static, dated price file (references/prices/azure-<region>.json: DBU rates per workload, DBUs and VM price per node type, SQL warehouse sizes) that refresh_prices.py rebuilds from the Azure Retail Prices API and the Azure calculator feed on demand. List prices only; actual spend comes from system.billing when available.
+description: Cost and run-time estimates for Databricks (sample price file for Azure; system.billing actuals on any cloud), including build cost (Genie Code turns, warehouse checks). Use when the user asks "how much will this cost", "cheapest option", "serverless or classic", "which warehouse size", "cost vs speed", "monthly cost of this pipeline or job", "refresh prices", "update the price file", or when de-advisor or de-sdd-spec needs a cost comparison. Computes from a static, dated price file (references/prices/azure-<region>.json: DBU rates per workload, DBUs and VM price per node type, SQL warehouse sizes) that refresh_prices.py rebuilds from the Azure Retail Prices API and the Azure calculator feed on demand. List prices only; actual spend comes from system.billing when available.
 metadata:
-  version: "0.2.0"
+  version: "0.3.0"
 ---
 
 # de-cost: price the options before choosing one
@@ -11,7 +11,9 @@ metadata:
 
 - **Price file**: `references/prices/azure-<region>.json` (and the readable `.md` beside it). Use the workspace's
   region from the environment record (`specs/env/<env>-<team>.md`) or ask. Always print the file's `generated_at`
-  and say "list price, pay-as-you-go". If the file is older than 90 days, say so and offer a refresh.
+  and say "list price, pay-as-you-go". If the file is older than 90 days, say so and offer a refresh. The shipped file
+  is a **sample** (Azure eastus2); for another cloud or region use `system.billing` actuals ("Actual cost" below) or
+  a refresh for that Azure region, and mark any rate taken from the sample as `[ASSUMED]`.
 - **Workload shape**: runs per month, data volume, expected run minutes, latency need. Take run minutes from real
   runs when they exist (pipeline update durations, job run durations, `system.billing.usage` if granted); otherwise
   state the assumption.
@@ -27,6 +29,12 @@ metadata:
 | SQL warehouse (pro / classic) | billed hours x size DBU per hour x pro or classic SQL rate, plus Azure VM cost billed separately |
 | Serverless jobs, notebooks, pipelines | DBUs consumed x serverless rate (infrastructure included); DBUs from billing actuals, or estimated from a comparable classic run and stated as an estimate |
 
+**Build cost** (beside run cost): building and checking a pipeline also costs money. Genie Code agent turns are
+billed as serverless inferencing DBUs, and the SQL warehouse time used for checks is billed while it runs. In one real
+QA build these were about 93 percent of the bill and job compute about 3 percent. Every estimate states both run cost
+and build cost (the build cost as `[ASSUMED]` unless taken from `system.billing`), and suggests a short warehouse
+auto-stop and batched checks.
+
 Billed hours = start-up + run + idle shutdown delay. Classic start-up on this kind of workspace is 4 to 10 minutes
 (measure it from cluster events); serverless start-up is seconds. Workload keys: `jobs`, `jobs_photon`,
 `all_purpose`, `pipeline_core|pro|advanced` (Lakeflow pipeline editions; meters still say "Delta Live Tables"),
@@ -38,15 +46,34 @@ Billed hours = start-up + run + idle shutdown delay. Classic start-up on this ki
 2. List 2 to 4 options that meet the requirement (from `de-advisor` or the spec), including at least one option the
    environment does not have yet when it would change the answer (for example serverless when only classic exists).
 3. For each option compute **wall time per run**, **cost per run** and **cost per month**, showing the arithmetic once
-   per option. With Python compute available you may run `scripts/estimate.py` with a scenario file; otherwise
-   compute by hand from the formulas. Never invent a rate that is not in the file.
+   per option. Do the arithmetic in the reply from the formulas; never run a code cell for an estimate
+   (`scripts/estimate.py` only when the user asks to run a scenario file). Never invent a rate that is not in the
+   file. Mark every number not taken from the price file or from actuals as `[ASSUMED]` (for example "about 3x faster
+   with Photon", node counts of a Pro or classic warehouse, run minutes without run history).
 4. **Balance cost and time**: the latency or SLA requirement is a hard filter; among the options that pass, prefer the
    lowest monthly cost unless a slower option risks the SLA window (less than 20 percent headroom). Say which option
    is cheapest, which is fastest, and which is the best fit, with one sentence why.
 5. When actuals exist (`system.billing.usage` joined to list prices), compare estimate and actual and say which to trust.
 
 Output table: option, available now or needs enablement, wall time per run, DBU per run, USD per run, USD per
-month, fits SLA (yes / no), notes.
+month, fits SLA (yes / no), notes. Below it: build cost (agent turns plus warehouse check time).
+
+## Actual cost (any cloud, when `system.billing` is granted)
+
+List-price USD for one job or pipeline over the last 30 days (meters for pipelines may still say "Delta Live Tables"):
+
+```sql
+SELECT u.usage_date, u.sku_name, SUM(u.usage_quantity) AS dbus,
+       SUM(u.usage_quantity * lp.pricing.default) AS list_usd
+FROM system.billing.usage u
+JOIN system.billing.list_prices lp
+  ON u.sku_name = lp.sku_name AND u.cloud = lp.cloud AND u.usage_unit = lp.usage_unit
+ AND u.usage_end_time >= lp.price_start_time
+ AND (lp.price_end_time IS NULL OR u.usage_end_time < lp.price_end_time)
+WHERE (u.usage_metadata.job_id = '<job_id>' OR u.usage_metadata.dlt_pipeline_id = '<pipeline_id>')
+  AND u.usage_date >= current_date() - INTERVAL 30 DAYS
+GROUP BY ALL ORDER BY u.usage_date
+```
 
 ## Refresh the price file (user-triggered)
 
@@ -72,5 +99,7 @@ sizes and the serverless pipeline rate. If the feed changes shape, the script re
 - Cost never overrides guardrails or the spec's SLA.
 
 ## Changelog
+- 0.3.0: QA and gap-analysis fixes: build cost (agent turns, warehouse checks) beside run cost, `[ASSUMED]` marking,
+  arithmetic in the reply, price file is a sample, system.billing actual-cost query.
 - 0.2.0: workspace-only: Pipelines Editor, SDK, Git folder UI and bundle Deployments panel replace local CLI and CI steps.
 - 0.1.0: initial: static Azure price file with refresh script, estimate formulas and calculator, cost-time balance.

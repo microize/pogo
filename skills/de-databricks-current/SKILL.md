@@ -2,7 +2,7 @@
 name: de-databricks-current
 description: Cross-service name map and data engineering design patterns for Databricks (2026), plus routing to the official databricks-* skills for syntax. Use when a conversation uses an old service name (DLT, Asset Bundles, Workflows, Vector Search, Genie Spaces, AI Gateway) or an old pipeline API (import dlt, @dlt.table, @dlt.view, dlt.apply_changes, apply_changes_from_snapshot, LIVE. prefix), when choosing medallion layout, SCD type or CDC source handling, or when unsure which official skill reference holds the API. Does not hold product syntax; the official databricks-pipelines, databricks-dabs, databricks-jobs skills do.
 metadata:
-  version: "0.4.1"
+  version: "0.6.0"
 ---
 
 # de-databricks-current: right name, right pattern, right reference
@@ -21,13 +21,17 @@ a spec needs before any syntax is written.
 | Workflows | **Lakeflow Jobs** | `databricks-jobs` |
 | Ingestion connectors | **Lakeflow Connect** (databases, SaaS, Kafka) | `databricks-lakeflow-connect`, `databricks-lakeflow-connect-saas` |
 | Zerobus | **Zerobus Ingest** (direct write API, under Lakeflow Connect) | `databricks-zerobus-ingest` |
-| Vector Search | **AI Search** | `databricks-vector-search` |
-| Genie Spaces | **Genie Agents** | `databricks-genie-agents` |
-| Mosaic AI Gateway / Unity AI Gateway | **Unity Gateway** | `databricks-unity-gateway` |
+| Vector Search | **AI Search** | `databricks-vector-search` (if installed; not vendored by this kit), else `databricks-docs` |
+| Genie Spaces | **Genie Agents** | `databricks-genie-agents` (if installed; not vendored), else `databricks-docs` |
+| Mosaic AI Gateway / Unity AI Gateway | **Unity Gateway** | `databricks-unity-gateway` (if installed; not vendored), else `databricks-docs` |
+| Lakehouse Monitoring | **Data Profiling** | `databricks-unity-catalog/references/7-data-profiling.md` |
+| tag policies | **governed tags** (Unity Catalog; GA) | `databricks-unity-catalog` for tag DDL; `de-ontology-design` for vocabularies |
+| business glossary (in Databricks) | **Pages** (Unity Catalog business semantics; Beta where available, check release notes) | `databricks-docs` |
+| metric views (Unity Catalog business semantics) | **metric views**: GA on AWS per Databricks; some Azure / GCP pages still say Public Preview; check your cloud's release notes. Materialization: Preview | `databricks-metric-views` |
+| Domains, Genie Ontology | **Domains** (reported GA), **Genie Ontology** (reported Public Preview); both confirmed only by third parties at the time of writing: optional, never the default path | `databricks-docs` |
 | Databricks Assistant agent mode | **Genie Code** | runs these skills inside the workspace; no CLI on serverless (see AGENTS.md) |
 | Partitioning plus ZORDER | **Liquid clustering** (`CLUSTER BY AUTO`) | `databricks-pipelines/references/performance.md` |
-| Classic clusters by default | **Serverless** by default | `databricks-serverless`, `databricks-serverless-migration` |
-| Knowledge Assistant, Supervisor Agent | legacy, replaced by Genie Agents | `databricks-genie-agents` |
+| Classic clusters by default | **Serverless** by default | `databricks-serverless` (`databricks-serverless-migration` if installed; not vendored) |
 
 Say the current name; give the old one once in parentheses if the user used it.
 
@@ -44,13 +48,14 @@ Say the current name; give the old one once in parentheses if the user used it.
 | `apply_changes_from_snapshot` | `create_auto_cdc_from_snapshot_flow` |
 | `stored_as_scd_type="2"` | `stored_as_scd_type=2` (integer); SQL `STORED AS SCD TYPE 2` |
 | `LIVE.` prefix | plain dataset name |
-| `CREATE LIVE VIEW` read with `STREAM(...)` | a streaming view (`CREATE STREAMING LIVE VIEW` passed in the live test; check `databricks-pipelines` SQL reference) |
+| `CREATE LIVE VIEW` read with `STREAM(...)` | `CREATE TEMPORARY VIEW v AS SELECT ... FROM STREAM(src)`; downstream reads `FROM STREAM(v)` (`databricks-pipelines/references/temporary-view-sql.md`; legacy `CREATE STREAMING LIVE VIEW` only in old code) |
 | `partition_cols`, `PARTITIONED BY`, `ZORDER` on new tables | `cluster_by`, `CLUSTER BY AUTO` (liquid clustering) |
 | Databricks Asset Bundles (DABs) | Declarative Automation Bundles (file still `databricks.yml`) |
 | Workflows | Lakeflow Jobs |
 | Vector Search | AI Search |
 | Genie Spaces | Genie Agents |
 | Lakehouse Monitoring | Data Profiling |
+| tag policies | governed tags |
 | Mosaic AI Gateway | Unity Gateway |
 | Databricks Assistant agent mode | Genie Code |
 
@@ -67,10 +72,19 @@ Keep this table and the `## Current names (always apply)` table in AGENTS.md ide
 | Auto Loader options per format | `databricks-pipelines/references/auto-loader-*.md`, `options-*.md` |
 | querying SCD2 (`__START_AT`, `__END_AT`) | `databricks-pipelines/references/scd-2-querying.md` |
 | dedup, windows, late data, rescued-data quarantine, lag monitoring | `databricks-pipelines/references/streaming-patterns.md` |
+| late-arriving rows in MERGE or notebook pipelines; job branching, "data ready" signals, table copies, deletes from full snapshots, stable consumer interface; backfill plans; graph-shaped tables; entity resolution; personal data erasure requests (keep business rows) | `references/patterns.md` ("Idempotency and backfills", "Late-arriving data", "Orchestration, delivery and serving", "Graph-shaped tables", "Entity resolution", "Personal data erasure") |
 | liquid clustering keys, streaming state, joins | `databricks-pipelines/references/performance.md` |
 | bundle project layout, targets | `databricks-pipelines/references/1-project-initialization-with-dab.md`, `databricks-dabs` (read for `databricks.yml` structure; deploy from the Deployments panel, not the CLI commands shown there) |
 | jobs, tasks, triggers, notifications | `databricks-jobs` |
-| grants, row filters, column masks, lineage system tables | `databricks-unity-catalog` (`references/5-system-tables.md`) |
+| grants, lineage system tables | `databricks-unity-catalog` (`references/1-access-control.md`, `references/5-system-tables.md`) |
+| row filters, column masks, ABAC | `databricks-unity-catalog/references/4-fine-grained-access.md` |
+| sinks (Kafka, Event Hubs, external Delta) and `foreachBatch` from a pipeline | `databricks-pipelines/references/sink-python.md`; `foreach-batch-sink-python.md` (Public Preview, optional) |
+| materialized views in a pipeline, incremental refresh eligibility | `databricks-pipelines/references/materialized-view-sql.md` or `-python.md` |
+| migrating `import dlt` code | `databricks-pipelines/references/dlt-migration.md` |
+| materialized views in Databricks SQL (outside a pipeline: schedule, refresh), temporary tables, pipe syntax | `databricks-dbsql/references/materialized-views-pipes.md` |
+| AI Functions (`ai_query`, `ai_classify`, `ai_extract`, ...) in SQL | `databricks-dbsql/references/ai-functions.md` (design rules in `references/patterns.md`) |
+| Structured Streaming outside pipelines (checkpoints, triggers, stateful ops, joins, MERGE in `foreachBatch`) | `databricks-spark-structured-streaming` |
+| Python SDK calls (`WorkspaceClient`: jobs, pipelines, clusters, warehouses) | `databricks-python-sdk` |
 | serverless vs classic, STANDARD vs PERFORMANCE_OPTIMIZED | `databricks-serverless` |
 | synthetic or test data | `databricks-synthetic-data-gen` (Spark + Faker script). Drop its `DatabricksSession.builder.serverless()` line and use the notebook's `spark` |
 | anything else | `databricks-docs` (llms.txt lookup) |
@@ -102,6 +116,10 @@ catalog commits). Before a spec relies on one: check the Lakeflow pipelines rele
 date into the spec's Alternatives or Decision Log.
 
 ## Changelog
+- 0.6.0: patterns reference adds late-arriving data (recompute affected dates), orchestration/delivery/serving (If/else and for-each tasks, ready signals, DEEP CLONE copies, snapshot delete propagation, stable consumer interface), backfill plan with slice-first reconciliation, graph-shaped tables, entity resolution, status lines for metric views / Domains / Genie Ontology, and personal data erasure (separate PII, anonymize in place, purge old versions, human-run outside dev).
+- 0.5.0: QA and gap-analysis fixes: streaming view is `CREATE TEMPORARY VIEW ... FROM STREAM(src)`, non-vendored
+  official skills marked "if installed", Data Profiling row, unverified Knowledge Assistant row removed, unrouted
+  vendored references routed, snapshot `once` fix and backfill options, AI Functions / CDF / reset / bronze-fail rules.
 - 0.4.1: official skills are installed by the kit's install notebook (vendored in install/official).
 - 0.4.0: workspace-only: Pipelines Editor, SDK, Git folder UI and bundle Deployments panel replace local CLI and CI steps.
 - 0.3.0: code-level map as master copy of the AGENTS.md "Current names (always apply)" table (last synced 2026-11-11); streaming-view lesson.

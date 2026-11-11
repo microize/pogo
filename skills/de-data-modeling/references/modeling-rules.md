@@ -41,7 +41,7 @@
   validation query guarantees it).
 - Layout: `CLUSTER BY AUTO` or explicit liquid clustering keys on large facts (common filter and join keys); no
   `PARTITIONED BY` or `ZORDER` on new tables.
-- Comments on every table and column; PII columns tagged and masked or excluded in gold.
+- Comments on every table and column; PII columns tagged at bronze, hashed or masked by silver, none in gold.
 - Metric views for shared KPIs (official `databricks-metric-views` skill).
 - On classic compute materialized views recompute fully on each refresh (no serverless incremental refresh); keep gold
   MVs narrow or move heavy history to streaming tables.
@@ -56,6 +56,12 @@
 | One current row | `count(*) = count(DISTINCT natural_key)` where `is_current` |
 | Conformance | the same natural key has the same attributes in every fact's view of the dimension |
 | Reconciliation | `sum(measure)` in gold equals silver for the same grain and period |
+| Fan trap | joining a fact to a one-to-many child does not change `sum(measure)` (compare before and after the join); otherwise aggregate the child first or use a bridge |
+| Chasm trap | two facts sharing a dimension are never joined directly; each is aggregated to the shared grain, then combined |
+| Mixed grain | no fact holds rows at two grains (e.g. order and order line): `count(DISTINCT grain) = count(*)` per load and one documented grain |
+| Bridge weights | for weighted many-to-many bridges, `sum(weight) = 1` per group (tolerance 0.0001) |
+| SCD2 overlap and gaps | per natural key, no two versions overlap and `valid_to` of one equals `valid_from` of the next |
+| Inferred members | share of facts pointing at placeholder (late-arriving) dimension rows stays under the agreed limit, and placeholders are updated when the real row arrives |
 
 ## Review checklist
 
@@ -69,3 +75,6 @@
 8. Physical names, types, nullability, constraints, clustering, comments, PII tags present.
 9. Validation queries exist for every rule above.
 10. Compute consequences from the Environment section considered (MV refresh, cluster time).
+11. Join traps checked: no fan or chasm trap, no mixed grain, bridges weighted, SCD2 without overlaps or gaps.
+12. Semantic hand-off present when people or Genie query the model: metric views with synonyms, keys (RELY only after
+    checks), reviewed comments, certification plan, benchmark questions with expected SQL.

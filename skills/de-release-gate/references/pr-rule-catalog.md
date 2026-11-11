@@ -15,7 +15,7 @@ Severity: Blocker (BLOCK), Major (counts toward REQUEST_CHANGES), Minor (comment
 | AP-19 | stateful stream without watermark | Blocker |
 | AP-20 | SQL built with f-strings from input | Blocker |
 | AP-99 | `DROP TABLE` / `DROP SCHEMA` / `bundle destroy` in prod-path code | Blocker |
-| cross join | without an explicit comment justifying it | Blocker |
+| AP-21 | cross join without an explicit comment justifying it | Blocker |
 | bare `except:` | swallows errors | Advisory |
 
 ## 2. Schema-breaking changes (de-data-contract/references/breaking-change-catalog.md)
@@ -61,6 +61,8 @@ Severity: Blocker (BLOCK), Major (counts toward REQUEST_CHANGES), Minor (comment
 | implicit time zone handling | Advisory |
 | business logic in bronze | Advisory |
 | `replaceWhere` missing on partition overwrite in Jobs | Blocker |
+| a write with no stated answer to "what happens on re-run?" (same data twice, a retry after partial failure) | Advisory |
+| a join that can multiply rows (one-to-many into a fact) without a grain check after it | Advisory |
 
 ## 7. Security
 
