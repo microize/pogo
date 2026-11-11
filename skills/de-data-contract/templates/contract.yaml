@@ -1,0 +1,75 @@
+# Data contract: one file per table, at specs/contracts/<catalog>.<schema>.<table>.yaml
+contract:
+  table: <catalog>.<schema>.<table>
+  version: "1.0.0"                      # semver, see references/breaking-change-catalog.md
+  status: draft                         # draft | active | deprecated | retired
+  owner:
+    team: <team>
+    contact: <email>
+  domain: <business domain>
+  layer: bronze | silver | gold
+  grain: "one row per <entity> per <time>"
+  created: <YYYY-MM-DD>
+  updated: <YYYY-MM-DD>
+
+schema:
+  fields:
+    - name: order_id
+      type: BIGINT
+      nullable: false
+      description: "Business order identifier from <source>"
+      pii: false
+      sensitivity: internal             # public | internal | confidential | restricted
+    - name: <field>
+      type: <STRING | INT | BIGINT | DECIMAL(18,2) | DOUBLE | BOOLEAN | DATE | TIMESTAMP | ARRAY<..> | MAP<..> | STRUCT<..>>
+      nullable: true
+      description: ""
+      pii: false
+      sensitivity: internal
+  system_columns:                       # present when the table is an SCD2 AUTO CDC target
+    - __START_AT
+    - __END_AT
+
+keys:
+  primary_key: { fields: [order_id], enforced: informational }   # UC PK is informational; uniqueness guarded by expectation UNQ-01
+  natural_key: { fields: [<business key>], enforced: informational }
+  foreign_keys:
+    - { fields: [customer_id], references: <catalog>.<schema>.dim_customer.customer_id, enforced: informational }
+
+nullability_rules:
+  - field: order_id
+    nullable: false
+    enforcement: NOT NULL constraint + expect_or_fail
+    downstream_impact: "NULL breaks every join"
+
+cdc:
+  method: LOG_BASED                     # LOG_BASED | TIMESTAMP_BASED | FULL_SNAPSHOT
+  change_indicator: event_ts            # sequence column(s) used by AUTO CDC
+  delete_handling: SOFT_DELETE          # SOFT_DELETE | HARD_DELETE | TOMBSTONE
+  scd_type: 2                           # 1 | 2 | bitemporal | append-only
+  idempotency: GUARANTEED               # GUARANTEED | AT_LEAST_ONCE
+
+compatibility:
+  mode: backward                        # backward | forward | full | none
+  breaking_changes_in_this_version: []
+
+sla:
+  freshness: "T+1 by 06:00 UTC"
+  availability: "99.9%"
+  alerting: "job failure + expectation breach to <channel>"
+
+governance:
+  pii_columns: []
+  column_masks: []
+  row_filters: []
+  grants: "SELECT to <group>"
+  retention: "<policy>"
+
+consumers:
+  - name: <dashboard | pipeline | app | share>
+    team: <team>
+    usage: "<columns / joins used>"
+    impact_of_change: "<what breaks>"
+
+changelog:
+  - { version: "1.0.0", date: <YYYY-MM-DD>, change: "initial contract", by: <email> }

@@ -1,0 +1,267 @@
+{
+ "generated_at": "2026-11-11T06:43:54+00:00",
+ "region": "eastus2",
+ "calculator_region": "us-east-2",
+ "tier": "premium",
+ "currency": "USD",
+ "basis": "list price, pay-as-you-go, no commit discount, no reservations, no taxes",
+ "sources": [
+  "https://prices.azure.com/api/retail/prices",
+  "https://azure.microsoft.com/api/v3/pricing/databricks/calculator/?culture=en-us&discount=mosp"
+ ],
+ "dbu_rates": {
+  "jobs": {
+   "usd_per_dbu": 0.3,
+   "meter": "Premium Jobs Compute DBU",
+   "sku": "Premium Jobs Compute"
+  },
+  "jobs_photon": {
+   "usd_per_dbu": 0.3,
+   "meter": "Premium Jobs Compute Photon DBU",
+   "sku": "Premium Jobs Compute Photon"
+  },
+  "jobs_light": {
+   "usd_per_dbu": 0.22,
+   "meter": "Premium Jobs Light Compute DBU",
+   "sku": "Premium Jobs Light Compute"
+  },
+  "all_purpose": {
+   "usd_per_dbu": 0.55,
+   "meter": "Premium All-purpose Compute DBU",
+   "sku": "Premium All-purpose Compute"
+  },
+  "all_purpose_photon": {
+   "usd_per_dbu": 0.55,
+   "meter": "Premium All-Purpose Photon DBU",
+   "sku": "Premium All-Purpose Photon"
+  },
+  "pipeline_core": {
+   "usd_per_dbu": 0.3,
+   "meter": "Premium Core Compute Delta Live Tables DBU",
+   "sku": "Premium Core Compute Delta Live Tables"
+  },
+  "pipeline_pro": {
+   "usd_per_dbu": 0.38,
+   "meter": "Premium Pro Compute Delta Live Tables DBU",
+   "sku": "Premium Pro Compute Delta Live Tables"
+  },
+  "pipeline_advanced": {
+   "usd_per_dbu": 0.54,
+   "meter": "Premium Advanced Compute Delta Live Tables DBU",
+   "sku": "Premium Advanced Compute Delta Live Tables"
+  },
+  "pipeline_core_photon": {
+   "usd_per_dbu": 0.3,
+   "meter": "Premium Core Compute Photon Delta Live Tables DBU",
+   "sku": "Premium Core Compute Photon Delta Live Tables"
+  },
+  "pipeline_pro_photon": {
+   "usd_per_dbu": 0.38,
+   "meter": "Premium Pro Compute Photon Delta Live Tables DBU",
+   "sku": "Premium Pro Compute Photon Delta Live Tables"
+  },
+  "pipeline_advanced_photon": {
+   "usd_per_dbu": 0.54,
+   "meter": "Premium Advanced Compute Photon Delta Live Tables DBU",
+   "sku": "Premium Advanced Compute Photon Delta Live Tables"
+  },
+  "sql_classic": {
+   "usd_per_dbu": 0.22,
+   "meter": "Premium SQL Analytics DBU",
+   "sku": "Premium SQL Analytics"
+  },
+  "sql_pro": {
+   "usd_per_dbu": 0.55,
+   "meter": "Premium SQL Compute Pro DBU",
+   "sku": "Premium SQL Compute Pro"
+  },
+  "sql_serverless": {
+   "usd_per_dbu": 0.7,
+   "meter": "Premium Serverless SQL DBU",
+   "sku": "Premium Serverless SQL"
+  },
+  "serverless_jobs": {
+   "usd_per_dbu": 0.45,
+   "meter": "Premium Automated Serverless Compute DBU",
+   "sku": "Premium Automated Serverless Compute"
+  },
+  "serverless_notebooks": {
+   "usd_per_dbu": 0.95,
+   "meter": "Premium Interactive Serverless Compute DBU",
+   "sku": "Premium Interactive Serverless Compute"
+  },
+  "serverless_database": {
+   "usd_per_dbu": 0.26,
+   "meter": "Premium Database Serverless Compute DBU",
+   "sku": "Premium Database Serverless Compute"
+  },
+  "model_training": {
+   "usd_per_dbu": 0.65,
+   "meter": "Premium Model Training DBU",
+   "sku": "Premium Model Training"
+  },
+  "serverless_pipelines": {
+   "usd_per_dbu": 0.45,
+   "source": "calculator feed (lakeflow-serverless-compute)"
+  }
+ },
+ "missing_rates": [],
+ "classic_nodes": {
+  "d4dsv4": {
+   "arm_sku": "Standard_D4ds_v4",
+   "dbu_per_hour": 0.75,
+   "photon_dbu_multiplier": 2.5,
+   "vcpu": 4,
+   "ram_gb": 16.0,
+   "vm_usd_per_hour": 0.226
+  },
+  "d8dsv4": {
+   "arm_sku": "Standard_D8ds_v4",
+   "dbu_per_hour": 1.5,
+   "photon_dbu_multiplier": 2.5,
+   "vcpu": 8,
+   "ram_gb": 32.0,
+   "vm_usd_per_hour": 0.452
+  },
+  "d16dsv4": {
+   "arm_sku": "Standard_D16ds_v4",
+   "dbu_per_hour": 3.0,
+   "photon_dbu_multiplier": 2.5,
+   "vcpu": 16,
+   "ram_gb": 64.0,
+   "vm_usd_per_hour": 0.904
+  },
+  "d4dsv5": {
+   "arm_sku": "Standard_D4ds_v5",
+   "dbu_per_hour": 1.0,
+   "photon_dbu_multiplier": 2.5,
+   "vcpu": 4,
+   "ram_gb": 16.0,
+   "vm_usd_per_hour": 0.226
+  },
+  "d8dsv5": {
+   "arm_sku": "Standard_D8ds_v5",
+   "dbu_per_hour": 2.0,
+   "photon_dbu_multiplier": 2.5,
+   "vcpu": 8,
+   "ram_gb": 32.0,
+   "vm_usd_per_hour": 0.452
+  },
+  "d16dsv5": {
+   "arm_sku": "Standard_D16ds_v5",
+   "dbu_per_hour": 4.0,
+   "photon_dbu_multiplier": 2.5,
+   "vcpu": 16,
+   "ram_gb": 64.0,
+   "vm_usd_per_hour": 0.904
+  },
+  "e4dsv4": {
+   "arm_sku": "Standard_E4ds_v4",
+   "dbu_per_hour": 1.0,
+   "photon_dbu_multiplier": 2.5,
+   "vcpu": 4,
+   "ram_gb": 32.0,
+   "vm_usd_per_hour": 0.288
+  },
+  "e8dsv4": {
+   "arm_sku": "Standard_E8ds_v4",
+   "dbu_per_hour": 2.0,
+   "photon_dbu_multiplier": 2.5,
+   "vcpu": 8,
+   "ram_gb": 64.0,
+   "vm_usd_per_hour": 0.576
+  },
+  "e16dsv4": {
+   "arm_sku": "Standard_E16ds_v4",
+   "dbu_per_hour": 4.0,
+   "photon_dbu_multiplier": 2.5,
+   "vcpu": 16,
+   "ram_gb": 128.0,
+   "vm_usd_per_hour": 1.152
+  },
+  "e4dsv5": {
+   "arm_sku": "Standard_E4ds_v5",
+   "dbu_per_hour": 1.5,
+   "photon_dbu_multiplier": 2.5,
+   "vcpu": 4,
+   "ram_gb": 32.0,
+   "vm_usd_per_hour": 0.288
+  },
+  "e8dsv5": {
+   "arm_sku": "Standard_E8ds_v5",
+   "dbu_per_hour": 2.75,
+   "photon_dbu_multiplier": 2.5,
+   "vcpu": 8,
+   "ram_gb": 64.0,
+   "vm_usd_per_hour": 0.576
+  },
+  "e16dsv5": {
+   "arm_sku": "Standard_E16ds_v5",
+   "dbu_per_hour": 5.5,
+   "photon_dbu_multiplier": 2.5,
+   "vcpu": 16,
+   "ram_gb": 128.0,
+   "vm_usd_per_hour": 1.152
+  },
+  "l8sv3": {
+   "arm_sku": "Standard_L8s_v3",
+   "dbu_per_hour": 2.75,
+   "photon_dbu_multiplier": 2.5,
+   "vcpu": 8,
+   "ram_gb": 64.0,
+   "vm_usd_per_hour": 0.698
+  },
+  "l16sv3": {
+   "arm_sku": "Standard_L16s_v3",
+   "dbu_per_hour": 5.5,
+   "photon_dbu_multiplier": 2.5,
+   "vcpu": 16,
+   "ram_gb": 128.0,
+   "vm_usd_per_hour": 1.396
+  }
+ },
+ "sql_warehouse_sizes": {
+  "twoxsmall": {
+   "display": "2X-Small",
+   "dbu_per_hour": 4.0
+  },
+  "xsmall": {
+   "display": "X-Small",
+   "dbu_per_hour": 6.0
+  },
+  "small": {
+   "display": "Small",
+   "dbu_per_hour": 12.0
+  },
+  "medium": {
+   "display": "Medium",
+   "dbu_per_hour": 24.0
+  },
+  "large": {
+   "display": "Large",
+   "dbu_per_hour": 40.0
+  },
+  "xlarge": {
+   "display": "X-Large",
+   "dbu_per_hour": 80.0
+  },
+  "twoxlarge": {
+   "display": "2X-Large",
+   "dbu_per_hour": 144.0
+  },
+  "threexlarge": {
+   "display": "3X-Large",
+   "dbu_per_hour": 272.0
+  },
+  "fourxlarge": {
+   "display": "4X-Large",
+   "dbu_per_hour": 528.0
+  }
+ },
+ "formulas": {
+  "classic": "hours * nodes * (dbu_per_hour * photon_mult * usd_per_dbu[workload] + vm_usd_per_hour)",
+  "sql_warehouse_pro_or_classic": "hours * size_dbu * usd_per_dbu[sql_pro|sql_classic] (+ VM cost billed by Azure for classic/pro)",
+  "sql_serverless": "hours * size_dbu * usd_per_dbu[sql_serverless] (VM included)",
+  "serverless_jobs_or_pipelines": "dbus_consumed * usd_per_dbu[serverless_*] (VM included; dbus from system.billing.usage or an estimate)"
+ }
+}
