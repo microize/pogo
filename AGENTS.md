@@ -105,8 +105,9 @@ Everything happens inside the Databricks workspace; nothing in this method needs
   bundle target from the Git folder's **Deployments panel** (Public Preview; only targets in the same workspace, so
   prod is deployed from the prod workspace); admin settings. Say which you are using.
 - Genie Code has **no custom sub-agents, hooks or slash commands**: roles are skills; the goldfish runs in a new chat.
-- The official `databricks-*` skills must be installed in the same `.assistant/skills` folder (admin publishes both:
-  this repo's `install/install_skills` notebook and ai-dev-kit's `install_genie_code_skills.py` notebook).
+- The official `databricks-*` skills must be installed in the same `.assistant/skills` folder. This repo's
+  `install/install_skills` notebook installs both: the `de-*` skills and the vendored official skills in
+  `install/official/`.
 
 ## Project conventions (the lead fills this in; everything else is in `instructions/`)
 

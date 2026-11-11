@@ -2,7 +2,7 @@
 name: de-databricks-current
 description: Cross-service name map and data engineering design patterns for Databricks (2026), plus routing to the official databricks-* skills for syntax. Use when a conversation uses an old service name (DLT, Asset Bundles, Workflows, Vector Search, Genie Spaces, AI Gateway) or an old pipeline API (import dlt, @dlt.table, @dlt.view, dlt.apply_changes, apply_changes_from_snapshot, LIVE. prefix), when choosing medallion layout, SCD type or CDC source handling, or when unsure which official skill reference holds the API. Does not hold product syntax; the official databricks-pipelines, databricks-dabs, databricks-jobs skills do.
 metadata:
-  version: "0.4.0"
+  version: "0.4.1"
 ---
 
 # de-databricks-current: right name, right pattern, right reference
@@ -75,9 +75,9 @@ Keep this table and the `## Current names (always apply)` table in AGENTS.md ide
 | synthetic or test data | `databricks-synthetic-data-gen` (Spark + Faker script). Drop its `DatabricksSession.builder.serverless()` line and use the notebook's `spark` |
 | anything else | `databricks-docs` (llms.txt lookup) |
 
-If the official skills are not installed in this workspace, say so and ask the admin to publish them with the
-`install_genie_code_skills.py` notebook from databricks-solutions/ai-dev-kit, run in the workspace (README, "Official
-skills") before writing pipeline code. Skip `databricks-core`'s CLI floor check and profile selection (there is no
+If the official skills are not installed in this workspace, say so and ask the admin to run the kit's
+`install/install_skills` notebook with `include_official` = `yes` (README, "Official skills") before writing
+pipeline code. Skip `databricks-core`'s CLI floor check and profile selection (there is no
 CLI in Genie Code); open the product skill's `references/*.md` directly, and use the SDK or UI equivalent of any CLI
 command it shows.
 
@@ -102,6 +102,7 @@ catalog commits). Before a spec relies on one: check the Lakeflow pipelines rele
 date into the spec's Alternatives or Decision Log.
 
 ## Changelog
+- 0.4.1: official skills are installed by the kit's install notebook (vendored in install/official).
 - 0.4.0: workspace-only: Pipelines Editor, SDK, Git folder UI and bundle Deployments panel replace local CLI and CI steps.
 - 0.3.0: code-level map as master copy of the AGENTS.md "Current names (always apply)" table (last synced 2026-11-11); streaming-view lesson.
 - 0.2.2: dimensional modeling rules moved to de-data-modeling.

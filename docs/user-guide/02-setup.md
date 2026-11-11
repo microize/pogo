@@ -10,13 +10,12 @@ Done by a workspace admin.
 1. Add this kit to the workspace as a **Git folder**: Workspace > Create > Git folder, paste the kit's repository URL.
 2. In that Git folder open the notebook `install/install_skills`. Set the widget `scope` to `workspace` and click
    **Run all**. It:
-   - copies `skills/de-*` to `/Workspace/.assistant/skills/` (visible to every user),
+   - copies `skills/de-*` and the 16 official `databricks-*` skills in `install/official/` to
+     `/Workspace/.assistant/skills/` (visible to every user; no internet access needed),
    - writes `/Workspace/.assistant_workspace_instructions.md` from `instructions/genie-code-user-instructions.md`,
    - writes a `_VERSION` stamp next to the skills,
-   - checks each installed skill against the Git folder and prints `13 ok, 0 failed`.
-3. Install the official `databricks-*` skills into the same folder with the `install_genie_code_skills.py` notebook from
-   https://github.com/databricks-solutions/ai-dev-kit (add that repo as a Git folder too and run the notebook).
-4. Open any notebook, open Genie Code, start a **new** chat and type `@de-`. You should see the `de-*` skills in the list.
+   - checks each installed skill against the Git folder and prints `29 ok, 0 failed` (13 + 16).
+3. Open any notebook, open Genie Code, start a **new** chat and type `@de-`. You should see the `de-*` skills in the list.
 
 To update later: pull the kit's Git folder (Git dialog > **Pull**) and run `install/install_skills` again.
 
@@ -52,7 +51,7 @@ That is all. The steps you do yourself (pull, commit and push, deploy a bundle t
 | Check | Where | Expected |
 |---|---|---|
 | Skills visible | new Genie Code chat, type `@de-` | 13 `de-*` skills listed |
-| Install verified | last cell of `install/install_skills` | `13 ok, 0 failed` |
+| Install verified | last cell of `install/install_skills` | `29 ok, 0 failed` |
 | Project rules read | ask "what are the rules of this project?" in a chat opened from a project file | it quotes AGENTS.md |
 | Environment known | `specs/env/` in the project | a file for your environment and team, no Blocking items for your goal |
 | Git works | Git dialog of the project folder | your branch, **Pull** succeeds |

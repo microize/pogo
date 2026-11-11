@@ -12,6 +12,7 @@ whose frontmatter has `name` and `description`.
 |---|---|
 | `skills/de-*/` | the 13 skills |
 | `install/install_skills.py` | notebook that publishes the skills to the workspace and verifies them |
+| `install/official/` | 16 official `databricks-*` skills, vendored unmodified at the pinned release, with their license |
 | `AGENTS.md` | the method's rules and routing, copied into each project folder |
 | `instructions/` | conventions, security guardrails, waivers, and paste-ready Genie Code instructions |
 | `docs/user-guide/` | the guide for engineers |
@@ -95,7 +96,7 @@ AUTO CDC, expectations, SCD2 querying, performance, running a pipeline), `databr
 The package has **13 skills**. Six are the method: `de-sdd-spec`, `de-goldfish-review`, `de-sdd-implement`,
 `de-sdd-tracking`, `de-advisor`, `de-databricks-current`. Seven support it at the right task: `de-data-contract`,
 `de-quality-testing`, `de-run-diagnose`, `de-release-gate`, `de-data-modeling`, `de-env-check`, `de-cost`.
-Install all 13; the install notebook's last cell expects `13 ok, 0 failed`.
+Install all 13; the install notebook installs them together with the official skills and expects `29 ok, 0 failed`.
 
 ## Install (in the workspace)
 
@@ -106,19 +107,22 @@ Genie Code discovers skills in `/Users/<your-email>/.assistant/skills/` (persona
 2. Open the notebook `install/install_skills` in it and attach serverless compute.
 3. Set the widget `scope`: `personal` (just you) or `workspace` (admin; also writes
    `/Workspace/.assistant_workspace_instructions.md` from `instructions/genie-code-user-instructions.md` and a
-   `_VERSION` stamp). Optional `dry_run` = `yes` shows what would change. Run all.
-4. The last cell prints `13 ok, 0 failed`. Start a **new** Genie Code chat in agent mode (hard-refresh the browser if
+   `_VERSION` stamp). `include_official` = `yes` (default) also installs the official skills. Optional
+   `dry_run` = `yes` shows what would change. Run all.
+4. The last cell prints `29 ok, 0 failed`. Start a **new** Genie Code chat in agent mode (hard-refresh the browser if
    the skills do not appear). Skills load by description, or mention them with `@de-sdd-spec`.
 
 To update: pull in the Git folder dialog, re-run the notebook.
 
 ### Official skills
 
-Install the official `databricks-*` skills into the same folder with the
-`install_genie_code_skills.py` notebook from https://github.com/databricks-solutions/ai-dev-kit (import it into the
-workspace or create a Git folder of that repo). Install at least `databricks-core`, `databricks-pipelines`,
-`databricks-dabs`, `databricks-jobs`, `databricks-unity-catalog`, `databricks-serverless`, `databricks-docs`, and the
-ingestion skill you use (`databricks-lakeflow-connect`, `databricks-lakeflow-connect-saas`, `databricks-zerobus-ingest`).
+`install/official/` holds 16 official `databricks-*` skills copied **unmodified** from
+https://github.com/databricks/databricks-agent-skills at the pinned commit above, with that repo's `LICENSE`
+(Databricks License: use within or connecting to Databricks) and `NOTICE`; `install/official/SOURCE.md` says how to
+move the pin. `install/install_skills` installs them with the `de-*` skills, so the workspace needs no internet access
+to GitHub: `databricks-core`, `-pipelines`, `-dabs`, `-jobs`, `-unity-catalog`, `-serverless`, `-docs`,
+`-lakeflow-connect`, `-lakeflow-connect-saas`, `-zerobus-ingest`, `-synthetic-data-gen`, `-dbsql`, `-metric-views`,
+`-spark-structured-streaming`, `-python-sdk`, `-iceberg`.
 
 **Project folders.** Copy `AGENTS.md` and `instructions/` into the root of each project's Git folder where the method
 should apply. Genie Code walks up the folder tree from the open file and injects any `AGENTS.md` it finds.
@@ -201,7 +205,7 @@ fix task, PR gate). Statuses, used identically in spec header, tasks header, pro
 ## Org-wide use
 
 A workspace admin runs `install/install_skills` with `scope` = `workspace` once per workspace (and again after each
-update), plus ai-dev-kit's notebook for the official skills; engineers then install nothing. Each workspace (dev,
+update); it installs the official skills too, so engineers then install nothing. Each workspace (dev,
 prod) is published from its own Git folder of this repo.
 
 ## Track IDs
