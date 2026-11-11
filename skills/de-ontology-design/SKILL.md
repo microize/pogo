@@ -2,7 +2,7 @@
 name: de-ontology-design
 description: Ontology and knowledge-graph design from data already in Databricks, for data modelers and architects. Use when the user asks which concepts, entities, properties or relationships the data supports, to design or review an ontology or concept model, to prepare data for a knowledge graph or GraphRAG, or for glossary terms from tables. Produces specs/ontology/<domain>/ontology.md (concepts, properties, relationships, vocabularies, identity, competency-question coverage, each with evidence) from Unity Catalog metadata and counts-only profiles; optional OWL or LinkML text. Advisory only: never builds graph tables, loads a graph database or changes data.
 metadata:
-  version: "0.1.0"
+  version: "0.1.1"
 ---
 
 # de-ontology-design: what concepts our data can support
@@ -28,8 +28,9 @@ Rules for turning tables and columns into concepts: `references/derivation-rules
   Open questions go in the file, not into silent choices.
 - Record struggles (no access to `information_schema` or lineage, ambiguous keys, failed queries) through
   `de-sdd-tracking` in `.challenges_<your-email>/ontology-<domain>.md`, redacted.
-- Current names: Unity Catalog governed tags, metric views, Domains (status unverified; see `de-databricks-current`); Pages (glossary) and Genie Ontology are optional
-  and Preview / Beta where available. Say so when you mention them.
+- Current names: Unity Catalog governed tags, metric views, Discover domains, Pages (glossary) and Genie Ontology (GA per
+  the Nov 2026 release notes; see `de-databricks-current`), all optional. Sensitivity of properties comes from the
+  governed tags that `de-data-governance` proposes.
 
 ## Steps
 
@@ -88,6 +89,7 @@ profile, and competency questions it cannot answer. Findings as Blocker / Major 
 - Schema change impact on consumers: `de-data-contract`. Rules that validate data: `de-quality-testing`.
 
 ## Changelog
+- 0.1.1: status of Domains, Pages and Genie Ontology updated; sensitivity from de-data-governance tags.
 - 0.1.0: initial: concepts, properties, relationships, vocabularies, hierarchies and identity proposed from Unity
   Catalog metadata and counts-only profiles, with evidence levels and competency-question coverage; optional OWL or
   LinkML text export. Advisory only.

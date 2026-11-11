@@ -2,7 +2,7 @@
 name: de-data-modeling
 description: Dimensional and lakehouse data modeling for Databricks, for data modelers and architects. Use when the user asks to design or review a data model, star schema, bus matrix, conformed dimensions, fact grain, dimension design, surrogate keys, SCD per attribute, Data Vault, logical or physical model, ERD or model diagram, "model review" of an existing gold layer, or to make gold ready for people and Genie (metric views, synonyms, keys, comments, Genie Agent setup, semantic layer). Produces specs/models/<model>/model.md (business processes, bus matrix, grain, logical and physical model, Mermaid diagram, validation queries), runs a review step and hands the approved model to de-sdd-spec. Never writes pipeline code.
 metadata:
-  version: "0.2.0"
+  version: "0.2.1"
 ---
 
 # de-data-modeling: model first, then spec, then build
@@ -61,11 +61,12 @@ pipeline code (that is `de-sdd-implement`, after an approved spec). Rules and pa
      a build task; add `RELY` only after the orphan and grain checks pass (RELY on dirty data gives wrong results).
    - **Comments:** every table and column a consumer sees; AI-generated comments are drafts until the user accepts
      them (saving one is an `ALTER`, so do it in the build task, not live on a running pipeline).
-   - **Placement and trust:** governed tags (domain, classification), Unity Catalog Domain if used (status unverified; see `de-databricks-current`), and which assets are
-     certified at release; retired ones are deprecated.
+   - **Placement and trust:** governed tags (domain, classification), Discover domain if used (GA; see `de-databricks-current`), and which assets are
+     certified at release; retired ones are deprecated. The tag taxonomy, the certification rubric and the
+     certified-before-use check come from `de-data-governance`; a Genie Agent source that fails it is a WARN.
    - **Genie Agent setup** when Genie is a consumer: at most about 5 tables or metric views per agent, join
      relationships where no FK exists, example SQL for the hard questions, and the benchmark questions from step 2.
-   - Glossary terms and Genie Ontology: `de-ontology-design` (statuses unverified; see `de-databricks-current`).
+   - Glossary terms and Genie Ontology: `de-ontology-design` (Pages and Genie Ontology GA per the Nov 2026 release notes; see `de-databricks-current`).
 7. **Diagram and validation.** A Mermaid `erDiagram` in `model.md`, and validation queries (pass/fail only) for grain
    uniqueness, orphan foreign keys, unknown-row share, one current row per SCD2 key, conformed-dimension consistency,
    and measure reconciliation against silver. Add the join-trap checks from `references/modeling-rules.md` (fan trap,
@@ -86,6 +87,7 @@ pipeline code (that is `de-sdd-implement`, after an approved spec). Rules and pa
 - Ontology or knowledge-graph design (concepts, properties, relationships across domains): `de-ontology-design`.
 
 ## Changelog
+- 0.2.1: governed tags, certification rubric and certified-before-use check delegated to de-data-governance.
 - 0.2.0: method-selection table and Data Vault reference; Semantic mode and step 6b (metric views with synonyms, keys as join source with RELY after checks, reviewed
   comments, certification, Genie Agent setup), business questions as tests and Genie benchmarks, join-trap checks.
 - 0.1.0: initial; dimensional rules moved here from de-databricks-current/references/patterns.md; replaces the old

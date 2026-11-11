@@ -2,7 +2,7 @@
 name: de-release-gate
 description: Two gates for Databricks data engineering changes. PR gate: review a diff for anti-patterns, breaking schema changes, missing tests and DQ checks, hard-coded values, secrets, and docs, and give a merge disposition (APPROVE / REQUEST_CHANGES / BLOCK). Prod gate: pre-production readiness scorecard (bundle targets, run-as identity, compute, secrets, grants, DQ gates, SLA, rollback, operations) with a GO / CONDITIONAL_GO / NO_GO verdict. Use before merging or before deploying to prod. Read-only; never deploys.
 metadata:
-  version: "0.6.0"
+  version: "0.6.1"
 ---
 
 # de-release-gate: merge gate and prod gate
@@ -46,7 +46,7 @@ workspace it runs in, so the prod deploy happens from a Git folder in the **prod
 | Rollback | previous release on its own branch (`release/<track_id>-<n>`); rollback is "switch the prod Git folder to branch X and deploy"; `delta.deletedFileRetentionDuration` at least 7 days on targets so time travel works; backfill plan if an AUTO CDC target needs a full refresh |
 | Tests | unit tests (notebook-cell pytest) and pipeline tests (Pipelines Editor) passed in the workspace, with the summary in `progress.md`; acceptance criteria from spec section 15 all recorded |
 | Operations | runbook (where to look, how to re-run, who owns); on-call aware; post-release validation query ready |
-| Governance | PII columns tagged and masked per contract; contract version bumped if schema changed; impact report done for breaking changes; tables holding personal data have a tested erasure procedure (anonymize, keep business rows; see `de-databricks-current/references/patterns.md`) that a human runs outside dev |
+| Governance | the latest `de-data-governance` assessment (or a recheck limited to the new tables) shows no Blocker for the tables in this release: group owner, comments, `sensitivity` / `personal_data` on columns, sensitive columns protected; PII columns tagged and masked per contract; contract version bumped if schema changed; impact report done for breaking changes; tables holding personal data have a tested erasure procedure (anonymize, keep business rows; see `de-databricks-current/references/patterns.md`) that a human runs outside dev |
 
 Target layout (`mode: production`, `root_path`, `run_as`): official `databricks-dabs/references/bundle-structure.md`
 and `databricks-pipelines/references/pipeline-configuration.md` ("run_as"). Before every prod deploy the user creates
@@ -70,6 +70,7 @@ verification. Then re-run the prod gate when the track is done.
 Severity scale: findings are Blocker / Major / Minor; checks are PASS / WARN / FAIL (WARN counts as Major).
 
 ## Changelog
+- 0.6.1: prod gate Governance row reads the de-data-governance assessment for the released tables.
 - 0.6.0: PR rules for re-run behaviour and row-multiplying joins; run-health baseline in the Observability row; tested personal data erasure procedure in the Governance row; semantic and Genie readiness row.
 - 0.5.0: QA and gap-analysis fixes: full-refresh protection row (`pipelines.reset.allowed=false`), uncommitted Git folder code is a finding, API-created jobs recorded as API-managed.
 - 0.4.0: workspace-only: Pipelines Editor, SDK, Git folder UI and bundle Deployments panel replace local CLI and CI steps.

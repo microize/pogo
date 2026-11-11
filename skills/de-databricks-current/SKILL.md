@@ -2,7 +2,7 @@
 name: de-databricks-current
 description: Cross-service name map and data engineering design patterns for Databricks (2026), plus routing to the official databricks-* skills for syntax. Use when a conversation uses an old service name (DLT, Asset Bundles, Workflows, Vector Search, Genie Spaces, AI Gateway) or an old pipeline API (import dlt, @dlt.table, @dlt.view, dlt.apply_changes, apply_changes_from_snapshot, LIVE. prefix), when choosing medallion layout, SCD type or CDC source handling, or when unsure which official skill reference holds the API. Does not hold product syntax; the official databricks-pipelines, databricks-dabs, databricks-jobs skills do.
 metadata:
-  version: "0.6.0"
+  version: "0.7.0"
 ---
 
 # de-databricks-current: right name, right pattern, right reference
@@ -25,10 +25,11 @@ a spec needs before any syntax is written.
 | Genie Spaces | **Genie Agents** | `databricks-genie-agents` (if installed; not vendored), else `databricks-docs` |
 | Mosaic AI Gateway / Unity AI Gateway | **Unity Gateway** | `databricks-unity-gateway` (if installed; not vendored), else `databricks-docs` |
 | Lakehouse Monitoring | **Data Profiling** | `databricks-unity-catalog/references/7-data-profiling.md` |
-| tag policies | **governed tags** (Unity Catalog; GA) | `databricks-unity-catalog` for tag DDL; `de-ontology-design` for vocabularies |
-| business glossary (in Databricks) | **Pages** (Unity Catalog business semantics; Beta where available, check release notes) | `databricks-docs` |
+| tag policies | **governed tags** (Unity Catalog; GA) | `databricks-unity-catalog` for tag DDL; `de-data-governance` for taxonomy, coverage and ABAC policies; `de-ontology-design` for vocabularies |
+| PII scanning, sensitive data discovery | **Data Classification** (GA; auto-tagging Public Preview) and **ABAC** row filter / column mask policies on governed tags (GA) | `de-data-governance` (status table: `references/uc-governance-features.md`) |
+| business glossary (in Databricks) | **Pages** (Unity Catalog business semantics; GA per the Nov 2026 release notes; UC wikis Beta) | `databricks-docs` |
 | metric views (Unity Catalog business semantics) | **metric views**: GA on AWS per Databricks; some Azure / GCP pages still say Public Preview; check your cloud's release notes. Materialization: Preview | `databricks-metric-views` |
-| Domains, Genie Ontology | **Domains** (reported GA), **Genie Ontology** (reported Public Preview); both confirmed only by third parties at the time of writing: optional, never the default path | `databricks-docs` |
+| Domains, Genie Ontology | **Discover page and domains** (GA, Oct 2026) and **Genie Ontology** (GA, Nov 2026), per the Databricks release notes; optional, not the default path | `databricks-docs` |
 | Databricks Assistant agent mode | **Genie Code** | runs these skills inside the workspace; no CLI on serverless (see AGENTS.md) |
 | Partitioning plus ZORDER | **Liquid clustering** (`CLUSTER BY AUTO`) | `databricks-pipelines/references/performance.md` |
 | Classic clusters by default | **Serverless** by default | `databricks-serverless` (`databricks-serverless-migration` if installed; not vendored) |
@@ -116,6 +117,7 @@ catalog commits). Before a spec relies on one: check the Lakeflow pipelines rele
 date into the spec's Alternatives or Decision Log.
 
 ## Changelog
+- 0.7.0: governance rows: Data Classification and ABAC routed to de-data-governance; Pages, Discover domains and Genie Ontology statuses updated from the Sep to Nov 2026 release notes.
 - 0.6.0: patterns reference adds late-arriving data (recompute affected dates), orchestration/delivery/serving (If/else and for-each tasks, ready signals, DEEP CLONE copies, snapshot delete propagation, stable consumer interface), backfill plan with slice-first reconciliation, graph-shaped tables, entity resolution, status lines for metric views / Domains / Genie Ontology, and personal data erasure (separate PII, anonymize in place, purge old versions, human-run outside dev).
 - 0.5.0: QA and gap-analysis fixes: streaming view is `CREATE TEMPORARY VIEW ... FROM STREAM(src)`, non-vendored
   official skills marked "if installed", Data Profiling row, unverified Knowledge Assistant row removed, unrouted
