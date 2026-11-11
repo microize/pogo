@@ -45,6 +45,14 @@ environment failure.
 | Asset | Type | Location | Owner | Notes |
 |---|---|---|---|---|
 
+## Productivity
+
+| Item | Value |
+|---|---|
+| Productivity target | <for example 80%> time saved against manual estimates (de-sdd-tracking productivity report) |
+| Report cadence | <for example monthly, by the lead> |
+| Baseline | <optional: hours a typical small / full track took before the agent> |
+
 ## Known pain points
 
 -

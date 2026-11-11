@@ -1,5 +1,6 @@
 # Tasks: <track title>
 Budget: pipeline updates planned <n> / used 0; cluster minutes est <x> / actual 0 (de-sdd-implement updates this)
+Manual estimate: <h> h for all tasks by hand (agent-proposed, confirmed by <email> at task-list confirmation)
 
 Track id: `<track_id>` | Spec v<version> | Track type: full | small | hotfix | Status: IN_PROGRESS
 Legend: `[ ]` todo, `[~]` in progress, `[x]` done, `[!]` blocked
@@ -18,12 +19,16 @@ Rules
   No task scales up before the small-data task passed.
 - `test_mode` / `limit_rows` below are parameters **you add** to the pipeline configuration; they are not platform features.
 - Optional per task: `touches:` the tables and files it writes, so two people do not claim tasks that write the same object.
+- Each task has `estimate: manual <h> h (<one reason>)`: the time an experienced engineer would need by hand for the same
+  output and checks. The agent proposes it; the user confirms or corrects it with the task list. Used only for the
+  productivity report (`de-sdd-tracking`), never to rush a task.
 
 ## Phase A: Prerequisites
 
 - [ ] **T01** Project profile section for this track
   - files: `specs/project-profile.md` (append a `## Track <track_id>` section; the lead owns the rest of the file)
   - depends: none
+  - estimate: manual 0.5 h (profile section by hand)
   - verify in-workspace: the section lists catalog, schemas, compute, deployment, run-as identity, topology
 - [ ] **T02** Connectivity and permissions smoke test
   - depends: T01

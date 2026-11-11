@@ -2,7 +2,7 @@
 name: de-sdd-spec
 description: Spec-driven intake for Databricks data engineering work. Use when the user brings a new requirement or says "spec this", "write the spec", "requirement", "greenfield", "brownfield", "new track", "hotfix track", or asks to plan a data product before building it. Runs discovery, asks clarifying questions in rounds, writes specs/<track_id>/spec.md, waits for the user's explicit approval, resolves goldfish reviews, then produces plan.md and tasks.md. Never writes pipeline code. For syntax or building an already-approved pipeline use the official databricks-pipelines skill or de-sdd-implement.
 metadata:
-  version: "0.5.0"
+  version: "0.6.0"
 ---
 
 # de-sdd-spec: requirement to approved spec
@@ -31,6 +31,9 @@ pipeline, SQL, notebook or bundle code. That is `de-sdd-implement`, and only aft
   its full workspace path under that root, then read back. A file that lands elsewhere is a challenge entry.
 
 ### 1. Discovery (read before you ask)
+
+Add `current_timestamp() AS ts` to the first discovery query and write it as the spec header's `Intake started` line
+(`n/a` if discovery runs no query); `de-sdd-tracking` copies it into the progress Timeline.
 
 Brownfield: read `AGENTS.md`, `specs/project-profile.md`, `databricks.yml`, `resources/*.yml`, pipeline folders,
 `tests/`, contracts; list tables with `system.information_schema.tables` for the catalogs named. Record findings in a
@@ -99,7 +102,9 @@ as runnable queries, and all names taken from the user's answers. Present a summ
 `plan.md` (template) and `tasks.md` (template): ordered `T01...`, each with files, `depends:`, an `in-workspace:` or
 `user-run:` verification, `- [ ]`. Progressive structure is mandatory (prerequisites; build small; test small; expand
 one component at a time; deploy to dev; full data; release gate). Each task touches about three files and has a `validate:` line for the human.
-Present the list; the user confirms or reorders.
+Each task also has `estimate: manual <h> h (<reason>)`, the time an experienced engineer would need by hand; put the
+sum in the `Manual estimate:` header line. Present the list; the user confirms or reorders and may correct estimates
+in the same reply (rules in `de-sdd-tracking`, "Time and effort").
 
 ### 6. Ledgers
 
@@ -133,6 +138,7 @@ Reviewing your own spec in the same chat and calling it a goldfish review. Setti
 verbatim reply in the Decision Log.
 
 ## Changelog
+- 0.6.0: time and effort: `Intake started` header line from the first discovery query; per-task manual estimates confirmed with the task list.
 - 0.5.0: QA and gap-analysis fixes: deploy route asked when no serverless, file arrival plus schedule decision, decisions.md appended every round, project-prefixed memory notes, templates (profile runtime row, plan rollback matches release gate, pr_review vs release files, Touches field, hotfix unchanged-behaviour section, invariant acceptance checks).
 - 0.4.0: workspace-only: Git folder UI and bundle Deployments panel replace local CLI and CI steps.
 - 0.3.0: owner team asked once per project; known test gaps section in the spec.

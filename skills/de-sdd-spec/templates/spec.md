@@ -8,6 +8,7 @@ Track id: <shortname>_<YYYYMMDD>
 Context: greenfield | brownfield
 Owner: <email>
 Related tracks: -
+Intake started: <YYYY-MM-DD HH:MM> (from `current_timestamp()` in the first discovery query; `n/a` if none)
 
 Header lines are literal and machine-checked. Status values: DRAFT | IN_REVIEW | APPROVED (by <email>, <YYYY-MM-DD>) |
 IN_PROGRESS | BLOCKED | ON_HOLD | COMPLETE | ABANDONED | SUPERSEDED. Type: full | small | hotfix (minimums in tasks.md).

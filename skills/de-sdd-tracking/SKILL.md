@@ -1,8 +1,8 @@
 ---
 name: de-sdd-tracking
-description: Owns the work ledgers for spec-driven data engineering on Databricks so a team knows who did what: task claims in tasks.md (and the optional Unity Catalog events table), .internal_<email>/<track_id>/progress.md (evidence per task), .challenges_<email>/<track_id>.md (where the agent struggled), and track status. Use for "status", "where are we", "what is left", "who did what", "what did we struggle with", "show challenges", or when another skill must create or update these files. Does not implement tasks.
+description: Owns the work ledgers for spec-driven data engineering on Databricks so a team knows who did what: task claims in tasks.md (and the optional Unity Catalog events table), .internal_<email>/<track_id>/progress.md (evidence per task), .challenges_<email>/<track_id>.md (where the agent struggled), .internal_<email>/worklog.md (time per piece of work outside tracks), task and track start / finish times with manual-effort estimates, and track status. Use for "status", "where are we", "what is left", "who did what", "what did we struggle with", "show challenges", "time report", "productivity report", "how much time did we save", or when another skill must create or update these files. Does not implement tasks.
 metadata:
-  version: "0.5.0"
+  version: "0.6.0"
 ---
 
 # de-sdd-tracking: ledgers, claims, status
@@ -20,7 +20,7 @@ Events table DDL (admin creates once per catalog; everyone gets `SELECT` and `MO
 ```sql
 CREATE TABLE IF NOT EXISTS <catalog>.sdd.task_events (
   event_ts TIMESTAMP, track_id STRING, task_id STRING,
-  event STRING,          -- claim | tick | block | unclaim | challenge | spec_approved | review
+  event STRING,          -- claim | start | verified | tick | block | unclaim | challenge | spec_approved | review | handover | worklog
   email STRING, note STRING);
 ```
 `INSERT INTO <catalog>.sdd.task_events VALUES (current_timestamp(), '<track>', 'T03', 'claim', current_user(), '');`
@@ -40,7 +40,8 @@ Never write into another person's `.internal_*` or `.challenges_*`; read them fo
 ```
 specs/<track_id>/tasks.md                 # shared: order, dependencies, ownership (one line per claim or tick)
 .internal_<email>/index.md                # this person's tracks: template templates/index.md
-.internal_<email>/<track_id>/progress.md  # evidence per task: template templates/progress.md
+.internal_<email>/<track_id>/progress.md  # evidence and times per task: template templates/progress.md
+.internal_<email>/worklog.md              # time per piece of work outside a track: template templates/worklog.md
 .challenges_<email>/<track_id>.md         # struggles: template templates/challenges.md, append-only
 ```
 
@@ -56,7 +57,9 @@ Re-read a file right before writing it; on a save conflict re-read and re-apply 
 
 ### create (after approval, called by de-sdd-spec)
 Copy `progress.md` and `challenges.md` templates into this person's folders, fill the header with email, spec version and
-topology, add a row to `index.md`, and if org mode is on, `INSERT ... 'spec_approved'`.
+topology, copy the spec-phase times from the spec's `Intake started` / `Approved` header lines into the progress
+**Timeline**, add a row to `index.md`, and if org mode is on, `INSERT ... 'spec_approved'`. Create `worklog.md` from its
+template the first time this person needs it.
 
 ### claim
 Only a task whose `depends:` tasks are all `[x]` and that shows no other owner. Set the line to
@@ -68,6 +71,47 @@ Change only that task's marker, keep the owner, sync. Append the evidence row to
 query, pipeline update id or job run id, result numbers, files, commit or Git folder commit message). On tick, also
 update the track's status and done count in `.internal_<email>/index.md`. `[!]` needs a one-line blocker and a challenge entry.
 `unclaim` when a person stops without finishing: marker back to `[ ]`, owner removed, note in `progress.md`.
+
+### Time and effort (every task, every piece of work)
+
+The point is a number the team can defend: how long work took with the agent against how long it would have taken by
+hand. Times are measured, estimates are labelled as estimates, and nothing is guessed.
+
+- **Clock.** The only clock is the workspace: `current_timestamp()` folded into a query the step already runs (add
+  `current_timestamp() AS ts` to the claim-time check and to the verification query; no extra query and no extra
+  approval). Never take a time from your own sense of "now"; with no query in a step, write `n/a`, not a guess.
+  In org mode the event rows carry `event_ts` and are the source of truth.
+- **Per task** (columns in the `progress.md` task log): `Started` (first query after the claim), `Verified` (the
+  verification query that passed), `Ticked` (first query after the human's `ok`, normally the next task's start; for
+  the last task, the acceptance query), `Agent min` = Verified - Started, `Wait min` = Ticked - Verified (human review
+  and idle time), `Fix cycles`, `User-run steps`, `Manual est h` (from the task's `estimate:` line in `tasks.md`).
+  Arithmetic is done in the reply, not in a cell.
+- **Per track** (`progress.md` **Timeline**): intake started, spec approved, goldfish rounds, implementation started,
+  complete, amendments (count, Minor / Major). Spec-phase times come from the spec header.
+- **Outside a track** (advice, cost, environment check, model or ontology design, governance assessment, contract, DQ rules, diagnosis,
+  release gate): one row in `.internal_<email>/worklog.md` when the deliverable is handed over: date, started,
+  finished (first and last query of the work, or `n/a`), skill, request in one redacted line, output file, manual
+  estimate, outcome. Propose the manual estimate yourself in the closing message, never blocking:
+  `Logged: about 3 h by hand (say "est 5h" to correct).` A correction overwrites the row and marks it `user`.
+- **Manual estimate** = time an experienced engineer on this team would need without the agent, for the same output
+  and checks. Proposed by the agent with one reason (`2 h: 3 tables, SCD2, hand-written tests`), confirmed or
+  corrected by the user at task-list confirmation (tasks) or at hand-over (worklog). Mark the source `agent` or `user`.
+- **Rework counts.** Fix cycles, reopened tasks and amendments stay visible next to the time; speed with rework is
+  not a saving.
+- Org mode: `INSERT ... 'start'` and `'verified'` per task, and one `'worklog'` row per worklog line with
+  `note = 'skill=<s>;agent_min=<n>;manual_est_h=<h>;source=agent|user'`.
+
+### productivity report
+Scope: a track, a person (`me`), or the team, over a period (default: last 30 days). Read `progress.md` task logs,
+`worklog.md` files (or the events table in org mode). Report:
+1. Items counted, and items excluded for `n/a` times (say how many; do not fill them in).
+2. Elapsed with the agent (Agent min + Wait min) vs manual estimate, per skill and per track type; saving =
+   1 - elapsed / manual estimate, shown with the share of estimates confirmed by a user.
+3. Rework: fix cycles per task, amendments per track, reopened tasks; challenge count per skill.
+4. Against the target in `specs/project-profile.md` (`Productivity target`, for example 80%): met or not, and the three
+   skills or task kinds with the lowest saving, as candidates for better instructions.
+State in one line that estimates are self-reported and the figure is a trend, not a measurement of people. Never rank
+people.
 
 ### log challenge
 One entry per struggle (template). **Redact before pasting**: tokens, `dapi...`, connection strings, hostnames with
@@ -114,6 +158,7 @@ They are per person, redacted, and anyone may ask the lead to exclude their chal
 (`.gitignore` entry) and share only the lessons. Retention is stated in `specs/project-profile.md`.
 
 ## Changelog
+- 0.6.0: time and effort: task start / verified / ticked times from `current_timestamp()`, manual estimates (agent-proposed, user-confirmed), track timeline, `worklog.md` for work outside tracks, `productivity report`, new event types.
 - 0.5.0: QA and gap-analysis fixes: status flags ticked-but-uncommitted tasks in a Git folder; tick updates index.md; evidence carries the update or run id.
 - 0.4.0: workspace-only: Git folder UI and bundle Deployments panel replace local CLI and CI steps.
 - 0.3.0: ledger writes once per task (fewer save conflicts); handover operation.

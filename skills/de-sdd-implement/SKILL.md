@@ -2,7 +2,7 @@
 name: de-sdd-implement
 description: Task-by-task implementation of an approved data engineering spec on Databricks. Use when the user says "implement", "next task", "work on T03", "run the approved plan", or replies "approved" after a spec exists. Claims and executes specs/<track_id>/tasks.md one task at a time with verification, records evidence in .internal_<email>/, logs struggles to .challenges_<email>/, and never changes the spec without the user's approval.
 metadata:
-  version: "0.6.0"
+  version: "0.7.0"
 ---
 
 # de-sdd-implement: claim one task, verify, tick, repeat
@@ -24,7 +24,8 @@ If none is eligible because another person holds the dependency, say so and stop
 
 1. **Claim** through `de-sdd-tracking` (edit one line, then sync: Commit & Push in the Git folder dialog, save and re-open in a plain
    folder, INSERT in org mode). If the line now shows someone else, back off. Announce: "Starting T03: <title>.
-   Files: ... Verification: ...".
+   Files: ... Verification: ...". Add `current_timestamp() AS ts` to the first query after the claim: that is the
+   task's `Started` time, and also the previous task's `Ticked` time when it follows the human's `ok`.
 2. **Re-read the spec sections** the task touches (targets, rules, expectations, acceptance criteria).
 3. **Implement**, following `instructions/data-engineering-conventions.md` and `python-pyspark-conventions.md`.
    Syntax comes from the official `databricks-pipelines` references (`auto-cdc-*.md`, `expectations-*.md`,
@@ -35,7 +36,10 @@ If none is eligible because another person holds the dependency, say so and stop
    `user-run:` checks a human does in the workspace UI (bundle **Deployments panel** on `databricks.yml` in the
    Git folder, Git folder dialog, admin settings); ask for the result and paste it. A task is never ticked on an
    unverified claim.
-5. **Record** in `progress.md`: task, files, verification command and result numbers, timestamp, commit message if any.
+5. **Record** in `progress.md`: task, files, verification command and result numbers, timestamp, commit message if any,
+   and the task's row in **Time per task** (Started, Verified from `current_timestamp()` in the verification query,
+   Agent min, Fix cycles, User-run steps, Manual est h; `Ticked` and `Wait min` are filled when the next query runs).
+   Never invent a time: `n/a` when no query ran.
    Evidence names the pipeline update id or job run id it came from; a number without one is not evidence.
    Optional: the Delta version of each table the task writes, taken before the task (`DESCRIBE HISTORY t LIMIT 1`),
    so a bad task can be undone with `RESTORE TABLE t TO VERSION AS OF n`, in dev only.
@@ -86,7 +90,8 @@ run the tasks **back to back** without waiting for `next`:
   request: "T03 to T05 are not committed. Commit & Push first, or reply `run uncommitted`." Record the reply in
   `progress.md`.
 - Finish: when the last task is ticked, run every acceptance criterion, show a final Validate table, and set
-  `Status: COMPLETE` only after the human's OK.
+  `Status: COMPLETE` only after the human's OK. Fill the progress **Timeline** (`Complete` from the acceptance query's
+  timestamp, amendments) and end with one line: `Track time: <elapsed> with the agent vs <h> h manual estimate`.
 
 ## Missing prerequisite (catalog, schema, volume, compute, grant)
 
@@ -135,6 +140,7 @@ anything built that the spec did not request (each with its Decision Log row, or
 any spec-to-code gap as new tasks under "Review fixes" and wait for the user's go.
 
 ## Changelog
+- 0.7.0: time and effort: Started / Verified / Ticked times from `current_timestamp()` folded into existing queries, Time per task row, track Timeline and closing time line.
 - 0.6.0: QA and gap-analysis fixes: cost-aware checks and batched questions, stop on policy / permission / quota rejection, uncommitted-work note before job runs, tick updates index.md, additive deviations are Minor amendments, update / run id as evidence, no fourth fix, optional table version before task, Done lists unmet and unrequested items, REVOKE in guardrails, write-audit-publish note.
 - 0.5.0: workspace-only: Git folder UI and bundle Deployments panel replace local CLI and CI steps.
 - 0.4.0: budget per track, dry-run before the first real update of a new dataset, stuck-step check via query history.
