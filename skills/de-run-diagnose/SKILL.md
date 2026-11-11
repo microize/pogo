@@ -1,8 +1,8 @@
 ---
 name: de-run-diagnose
-description: Run, monitor, verify and debug Databricks pipelines and jobs in a bounded loop. Use when the user asks to run a pipeline or job and confirm it worked, or says "did my pipeline fail", "my job failed", "why did the run fail", "why is it slow", "the numbers look wrong", "repair the run", or a run failed, a Spark error or stack trace is pasted, a pipeline is slow or hanging, output tables look wrong, or PySpark code needs a performance review. Classifies the failure, applies a fix, re-runs at most three times, then escalates, and logs every struggle to .challenges_<email>/. Dev target only unless told otherwise.
+description: Run, monitor, verify and debug Databricks pipelines and jobs in a bounded loop. Use when the user asks to run a pipeline or job and confirm it worked, or says "did my pipeline fail", "my job failed", "why did the run fail", "why is it slow", "the numbers look wrong", "repair the run", or a run failed, a Spark error or stack trace is pasted, a pipeline is slow or hanging, output tables look wrong, or PySpark code needs a performance review. Also Explain mode: "explain this log", "what does this stack trace mean", "read this Spark UI / stage / query profile / EXPLAIN plan", "why is this stage slow", in plain language with the line or metric that shows it. Classifies the failure, applies a fix, re-runs at most three times, then escalates, and logs every struggle to .challenges_<email>/. Dev target only unless told otherwise.
 metadata:
-  version: "0.5.0"
+  version: "0.6.0"
 ---
 
 # de-run-diagnose: run, verify, fix, re-run, escalate
@@ -100,12 +100,32 @@ Write the report in chat and append it to the challenges file:
 error summary, verbatim stack trace (fenced), category and pattern id, what was tried per cycle, affected tables,
 recommended human action (grant, quota, decision), and the spec section it touches.
 
+## Explain mode (understand before fixing)
+
+When the user wants to **understand** a log, stack trace, cluster event, Spark UI page, query profile, `EXPLAIN` plan
+or pipeline event log, rather than (or before) fixing it. Follow `references/reading-evidence.md`:
+
+1. Say which evidence you have and which compute it came from; serverless has **no Spark UI and no Spark logs**, so
+   use `system.query.history` and the query profile there. Fetch what you can in-workspace (task output, event log,
+   query history, cluster events, `node_timeline`); ask the user for the smallest UI paste only when needed
+   (stage summary table, profile JSON, the `Caused by` lines), never for data rows.
+2. Answer in the fixed shape: what happened (plain words), the line or number that shows it, why (`measured`,
+   `likely` or `guess`), what to do (pattern id), what to check next. Define each Spark term on first use.
+3. Hand-offs: a fix to code or config continues in this skill's loop (step 5); a compute size, node family,
+   serverless or runtime question goes to `de-spark-runtime`; "would a newer runtime do this better" goes to
+   `de-spark-runtime` version advice.
+
+No re-run happens in Explain mode unless the user asks for one.
+
 ## Performance review mode
 
 When asked to review PySpark or pipeline performance rather than a failure: scan with
-`references/anti-pattern-catalog.md`, then check the Databricks-specific list: serverless used, liquid clustering (`CLUSTER BY AUTO`) instead of partitions and Z-ORDER, AQE on (default), broadcast hints for small dimensions, watermarks on stateful streams, no `collect()` / `toPandas()` on large frames, no Python UDF where a native function exists, incremental MV eligibility. Output a prioritized table: finding, impact, fix, effort.
+`references/anti-pattern-catalog.md`, then check the Databricks-specific list: serverless used, liquid clustering (`CLUSTER BY AUTO`) instead of partitions and Z-ORDER, AQE on (default), broadcast hints for small dimensions, watermarks on stateful streams, no `collect()` / `toPandas()` on large frames, no Python UDF where a native function exists, incremental MV eligibility. Then check the code against the runtime it runs on with `de-spark-runtime` version advice
+(functions to prefer or avoid on that Spark version, and what an upgrade would bring). Output a prioritized table:
+finding, impact, fix, effort.
 
 ## Changelog
+- 0.6.0: Explain mode with `references/reading-evidence.md` (where each piece of evidence lives per compute type, answer shape, stack traces, cluster event and termination codes, Spark UI decision steps from the Databricks guide, query profile insights, query history signals, plan reading with AQE, pipeline event log metrics); hand-offs to de-spark-runtime for compute and version advice.
 - 0.5.0: QA and gap-analysis fixes: job monitoring through the Python SDK (no CLI), repair_run recipe with
   idempotency check, plain-language triggers, "Tier 1" reworded in fix recipes, anti-pattern catalog defers to the
   PR rule catalog for PR severity and gains AP-21 (cross join).
@@ -115,4 +135,4 @@ When asked to review PySpark or pipeline performance rather than a failure: scan
 - 0.1.0: initial.
 
 ## Not this skill
-Prod deployment or go / no-go (`de-release-gate`), designing DQ rules (`de-quality-testing`), product syntax (official `databricks-pipelines`, `databricks-jobs`).
+Choosing or sizing compute and runtime versions, version-aware code advice (`de-spark-runtime`). Prod deployment or go / no-go (`de-release-gate`), designing DQ rules (`de-quality-testing`), product syntax (official `databricks-pipelines`, `databricks-jobs`).

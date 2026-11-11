@@ -75,7 +75,7 @@ df.groupBy("join_key").agg(count(lit(1)).alias("n")).orderBy(col("n").desc()).sh
 | Id | Symptom | Root cause | Fix |
 |---|---|---|---|
 | CFG-01 | `ClassNotFoundException` | missing library | declare in bundle / pipeline environment |
-| CFG-02 | behaviour changed after runtime upgrade | breaking change | pin runtime; read release notes |
+| CFG-02 | behaviour changed after runtime upgrade | breaking change (ANSI default from Spark 4.0, removed APIs such as `input_file_name()`, Python / package changes) | `de-spark-runtime` breakers table; pin the runtime until fixed |
 | CFG-03 | slow with no errors | bad partition count (classic) | AQE auto |
 | CFG-04 | works in dev, fails in prod | config mismatch | `de-release-gate` prod checks |
 | CFG-05 | `IllegalArgumentException` on a config key | typo | verify key |
