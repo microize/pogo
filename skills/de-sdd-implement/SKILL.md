@@ -2,7 +2,7 @@
 name: de-sdd-implement
 description: Task-by-task implementation of an approved data engineering spec on Databricks. Use when the user says "implement", "next task", "work on T03", "run the approved plan", or replies "approved" after a spec exists. Claims and executes specs/<track_id>/tasks.md one task at a time with verification, records evidence in .internal_<email>/, logs struggles to .challenges_<email>/, and never changes the spec without the user's approval.
 metadata:
-  version: "0.7.0"
+  version: "0.8.0"
 ---
 
 # de-sdd-implement: claim one task, verify, tick, repeat
@@ -47,7 +47,9 @@ If none is eligible because another person holds the dependency, say so and stop
 6. **Commit** when in a Git folder: user-run in the Git folder dialog > **Commit & Push** with message
    `feat(<track_id>): T03 <title>`; review the diff there first.
 7. **Hand the task to the human** with a **Validate** block, then wait (see "Autopilot"). Tick only after the human's
-   OK, unless they chose `auto`.
+   OK, unless they chose `auto`. The Validate block is never skipped, also not for a one-task track or when the work
+   ran inside one chat turn. Its query is count-only (check, actual, expected) and says where to run it: "SQL
+   editor, or a new cell of a scratch notebook on <compute>", never a cell of a pipeline notebook.
 
 ## Autopilot (default after approval)
 
@@ -81,6 +83,10 @@ run the tasks **back to back** without waiting for `next`:
 - **Stuck step**: when a SQL step still shows running well past its expected time, check the warehouse query
   history (`system.query.history` or the Query History page) before calling it failed; a stopped display is not a
   cancelled query. Say what you found.
+- **No looking at rows**: never `display()` or `SELECT *` a data table to check a result; checks return counts,
+  distinct counts and expected-vs-actual rows only (`instructions/security-guardrails.md`, Data).
+- **Sample data**: fixture files go into a new folder, or are written with `overwrite=False`; a platform block on a
+  write is a challenge entry, and the retry is the safer form, not a forced run.
 - Cost: pre-check SQL on the warehouse before starting classic compute; small data until the "full data" phase;
   one update per verification, not one per edit. Agent turns and SQL warehouse time are usually the biggest build
   cost, not job compute, so: combine a task's checks into one count-only query where possible (one row of counts, no
@@ -140,6 +146,7 @@ anything built that the spec did not request (each with its Decision Log row, or
 any spec-to-code gap as new tasks under "Review fixes" and wait for the user's go.
 
 ## Changelog
+- 0.8.0: live end-to-end test fixes: Validate block never skipped (count-only query and where to run it, never in a pipeline notebook); no row displays to check results; fixture files without overwrite.
 - 0.7.0: time and effort: Started / Verified / Ticked times from `current_timestamp()` folded into existing queries, Time per task row, track Timeline and closing time line.
 - 0.6.0: QA and gap-analysis fixes: cost-aware checks and batched questions, stop on policy / permission / quota rejection, uncommitted-work note before job runs, tick updates index.md, additive deviations are Minor amendments, update / run id as evidence, no fourth fix, optional table version before task, Done lists unmet and unrequested items, REVOKE in guardrails, write-audit-publish note.
 - 0.5.0: workspace-only: Git folder UI and bundle Deployments panel replace local CLI and CI steps.

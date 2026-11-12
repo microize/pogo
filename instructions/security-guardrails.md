@@ -31,7 +31,7 @@ Everything else (staging, prod, shared catalogs) is **non-dev**.
 - Git: force push, `reset --hard`, `clean -f`, `branch -D`, adding `.env`, `.databrickscfg`, `*.pem`, key or secret files.
 - Shell: recursive deletes outside cache and scratch paths, `sudo rm`, piping `curl` or `wget` into a shell, `pip install` from unknown indexes or git URLs, offensive tooling.
 - Secrets: printing or echoing any variable named `*TOKEN*`, `*SECRET*`, `*PASSWORD*`, `*API_KEY*`; `printenv`; reading `.env`; any `dapi...` token in a command.
-- Data: selecting or copying columns named like SSN, credit card, passport outside masked views; downloading PII, CONFIDENTIAL or RESTRICTED data to a laptop; pasting query output rows into ledgers or chat.
+- Data: selecting or copying columns named like SSN, credit card, passport outside masked views; downloading PII, CONFIDENTIAL or RESTRICTED data to a laptop; pasting query output rows into ledgers or chat; `display()` / `SELECT *` of a data table to "have a look" (use counts, distinct counts and expected-vs-actual rows).
 
 ## Always
 
@@ -49,5 +49,7 @@ Everything else (staging, prod, shared catalogs) is **non-dev**.
   is user-run: the agent writes and tests the procedure in dev; a human with approval runs it and records the request
   id, tables and row counts.
 - Redact before writing a challenge entry: tokens, hostnames with credentials, connection strings, row values.
+- Test fixtures and sample files: written into a new, dated folder or with `overwrite=False`; never overwrite files in a
+  landing path that a pipeline reads.
 - Pin dependencies; trusted indexes only.
 - Deviations are waivers in `instructions/waivers.md`, approved and dated.

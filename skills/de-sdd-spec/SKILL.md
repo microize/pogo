@@ -1,8 +1,8 @@
 ---
 name: de-sdd-spec
-description: Spec-driven intake for Databricks data engineering work. Use when the user brings a new requirement or says "spec this", "write the spec", "requirement", "greenfield", "brownfield", "new track", "hotfix track", or asks to plan a data product before building it. Runs discovery, asks clarifying questions in rounds, writes specs/<track_id>/spec.md, waits for the user's explicit approval, resolves goldfish reviews, then produces plan.md and tasks.md. Never writes pipeline code. For syntax or building an already-approved pipeline use the official databricks-pipelines skill or de-sdd-implement.
+description: Spec-driven intake for Databricks data engineering work. Use when the user brings a new requirement or a change to an existing pipeline or table ("add a new source / file / table to our pipeline", "integrate X", "add a column", "change how X is calculated", "backfill"), or says "spec this", "write the spec", "requirement", "greenfield", "brownfield", "new track", "hotfix track", or asks to plan a data product before building it. Runs discovery, asks clarifying questions in rounds, writes specs/<track_id>/spec.md, waits for the user's explicit approval, resolves goldfish reviews, then produces plan.md and tasks.md. Never writes pipeline code. For syntax or building an already-approved pipeline use the official databricks-pipelines skill or de-sdd-implement.
 metadata:
-  version: "0.6.0"
+  version: "0.7.0"
 ---
 
 # de-sdd-spec: requirement to approved spec
@@ -96,8 +96,14 @@ as runnable queries, and all names taken from the user's answers. Present a summ
   implementation.
 - `de-sdd-implement` checks both the header and the Decision Log row. No code file, notebook, pipeline or bundle
   resource exists before this gate. "Just start" gets: "approve the current draft as-is and I start".
+- **This skill never builds.** After approval, even in the same chat and even for a `small` or `hotfix` track, the
+  next step is step 5 (tasks) and then **load `de-sdd-implement`**; its loop (claim, Validate block, `ok`, tick,
+  ledgers) is the only way work gets done. A plan panel or a to-do list in chat is not `tasks.md`.
 
 ### 5. Plan and tasks
+
+`small` and `hotfix`: draft `tasks.md` (two to five tasks, no `plan.md`) together with the spec and show the task list
+in the approval summary, so one `approved` covers both; write the file right after approval.
 
 `plan.md` (template) and `tasks.md` (template): ordered `T01...`, each with files, `depends:`, an `in-workspace:` or
 `user-run:` verification, `- [ ]`. Progressive structure is mandatory (prerequisites; build small; test small; expand
@@ -138,6 +144,7 @@ Reviewing your own spec in the same chat and calling it a goldfish review. Setti
 verbatim reply in the Decision Log.
 
 ## Changelog
+- 0.7.0: live end-to-end test fixes: triggers for changes to an existing pipeline; this skill never builds: after approval it writes `tasks.md` (small / hotfix: drafted with the spec, approved together) and loads de-sdd-implement in the same chat.
 - 0.6.0: time and effort: `Intake started` header line from the first discovery query; per-task manual estimates confirmed with the task list.
 - 0.5.0: QA and gap-analysis fixes: deploy route asked when no serverless, file arrival plus schedule decision, decisions.md appended every round, project-prefixed memory notes, templates (profile runtime row, plan rollback matches release gate, pr_review vs release files, Touches field, hotfix unchanged-behaviour section, invariant acceptance checks).
 - 0.4.0: workspace-only: Git folder UI and bundle Deployments panel replace local CLI and CI steps.
