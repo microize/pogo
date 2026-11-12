@@ -313,8 +313,8 @@ Fixes after S3 were pushed (`b9a64da`) and installed (`32 ok`) before S4.
 | # | Request | Skills used | User messages | Result | Time with agent vs manual estimate |
 |---|---|---|---|---|---|
 | S1 | Did last night's load work? | de-run-diagnose | 1 | honest "nothing ran", evidence with run id, counts only | about 3 min (no estimate; read-only) |
-| S2 | Amounts never negative: add a check | de-sdd-spec, then de-sdd-implement | 1, then 5 for the backstop | found the rule already exists; backstop rule 1018 built with tasks, ledgers, Validate per task | about 20 min vs 1.x h |
-| S3 | Add a daily shipments file | de-sdd-spec, de-sdd-implement, de-sdd-tracking | 6 (plus one correction) | 2 datasets and 8 rules by config only; 10 acceptance checks pass; orders and payments unchanged | about 35 min (manual estimate in tasks.md) |
+| S2 | Amounts never negative: add a check | de-sdd-spec, then de-sdd-implement | 1, then 5 for the backstop | found the rule already exists; backstop rule 1018 built with tasks, ledgers, Validate per task | about 20 min vs 1.x h (agent's time line) |
+| S3 | Add a daily shipments file | de-sdd-spec, de-sdd-implement, de-sdd-tracking | 6 (plus one correction) | 2 datasets and 8 rules by config only; 10 acceptance checks pass; orders and payments unchanged | about 35 min wall clock by the tester (the agent's own time line was not captured) |
 | S4 | Revenue by region in the daily revenue table | de-sdd-spec, de-goldfish-review, de-sdd-implement, de-sdd-tracking | 8 (plus one correction) | grain change with impact check, review caught a positional-write defect, results exactly as predicted | about 57 min vs 2.0 h |
 | S5 | Daily net revenue (payments minus refunds) for a dashboard | de-sdd-spec, de-sdd-implement, de-sdd-tracking, de-release-gate | 8 | new gold fact, 3 rules, release gate blocked for a missing test, tests and runbook added by amendment, gate approved | about 45 min vs 4.5 h |
 
