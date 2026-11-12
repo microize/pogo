@@ -24,7 +24,10 @@ There are three levels. Ask your lead which ones are already done. As an enginee
    - checks every installed file and prints `32 ok, 0 failed` (16 + 16).
 3. Open any notebook, open Genie Code, start a **new** chat and type `@de-`. You should see the `de-*` skills.
 
-**To update later:** in the kit's Git folder click **Pull**, then run `install/install_skills` again.
+**To update later:** in the kit's Git folder click **Pull**, then run `install/install_skills` again. That updates the
+skills only. Each project keeps its own copy of `AGENTS.md` and `instructions/` (step B2), so after a kit update the
+lead compares them with the kit's versions and copies the changes into each project (keep the project's own
+"Project conventions" section), then **Commit & Push**.
 
 **Want to try it alone first?** Anyone can run the same notebook with `scope` = `personal`. It installs only for you
 (`/Users/<you>/.assistant/skills/`).

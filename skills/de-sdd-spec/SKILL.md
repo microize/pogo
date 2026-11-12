@@ -2,7 +2,7 @@
 name: de-sdd-spec
 description: Spec-driven intake for Databricks data engineering work. Use when the user brings a new requirement or a change to an existing pipeline or table ("add a new source / file / table to our pipeline", "integrate X", "add a column", "change how X is calculated", "backfill"), or says "spec this", "write the spec", "requirement", "greenfield", "brownfield", "new track", "hotfix track", or asks to plan a data product before building it. Runs discovery, asks clarifying questions in rounds, writes specs/<track_id>/spec.md, waits for the user's explicit approval, resolves goldfish reviews, then produces plan.md and tasks.md. Never writes pipeline code. For syntax or building an already-approved pipeline use the official databricks-pipelines skill or de-sdd-implement.
 metadata:
-  version: "0.7.1"
+  version: "0.7.2"
 ---
 
 # de-sdd-spec: requirement to approved spec
@@ -36,7 +36,11 @@ Add `current_timestamp() AS ts` to the first discovery query and write it as the
 (`n/a` if discovery runs no query); `de-sdd-tracking` copies it into the progress Timeline.
 
 Brownfield: read `AGENTS.md`, `specs/project-profile.md`, `databricks.yml`, `resources/*.yml`, pipeline folders,
-`tests/`, contracts; list tables with `system.information_schema.tables` for the catalogs named. Record findings in a
+`tests/`, contracts; list tables with `system.information_schema.tables` for the catalogs named.
+Discovery queries return metadata, counts, distinct counts and grouped totals only, never rows of data tables (no
+`display(...)` of a silver, bronze, gold or quarantine table; `instructions/security-guardrails.md`, Data). A claim
+that something does not exist ("no column X") needs `DESCRIBE` of the candidate tables in each layer, not only
+`information_schema`. Record findings in a
 `## Track <track_id>` section of `specs/project-profile.md` (the lead owns the rest of that file; never rewrite it).
 Greenfield: create the profile from `templates/project-profile.md` with the answers from step 2.
 Both: if `specs/project-profile.md` has no `## Environment (de-env-check)` section, or it is older than 30 days, load
@@ -145,6 +149,7 @@ Reviewing your own spec in the same chat and calling it a goldfish review. Setti
 verbatim reply in the Decision Log.
 
 ## Changelog
+- 0.7.2: discovery is counts / metadata only (a live test displayed quarantine rows) and absence claims need `DESCRIBE` (a live test said a column did not exist).
 - 0.7.1: the small / hotfix approval summary ends with the task list (live test: one summary had it, another did not).
 - 0.7.0: live end-to-end test fixes: triggers for changes to an existing pipeline; this skill never builds: after approval it writes `tasks.md` (small / hotfix: drafted with the spec, approved together) and loads de-sdd-implement in the same chat.
 - 0.6.0: time and effort: `Intake started` header line from the first discovery query; per-task manual estimates confirmed with the task list.

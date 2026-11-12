@@ -2,7 +2,7 @@
 name: de-sdd-implement
 description: Task-by-task implementation of an approved data engineering spec on Databricks. Use when the user says "implement", "next task", "work on T03", "run the approved plan", or replies "approved" after a spec exists. Claims and executes specs/<track_id>/tasks.md one task at a time with verification, records evidence in .internal_<email>/, logs struggles to .challenges_<email>/, and never changes the spec without the user's approval.
 metadata:
-  version: "0.8.1"
+  version: "0.8.2"
 ---
 
 # de-sdd-implement: claim one task, verify, tick, repeat
@@ -30,7 +30,8 @@ If none is eligible because another person holds the dependency, say so and stop
 1. **Claim** through `de-sdd-tracking` (edit one line, then sync: Commit & Push in the Git folder dialog, save and re-open in a plain
    folder, INSERT in org mode). If the line now shows someone else, back off. Announce: "Starting T03: <title>.
    Files: ... Verification: ...". Add `current_timestamp() AS ts` to the first query after the claim: that is the
-   task's `Started` time, and also the previous task's `Ticked` time when it follows the human's `ok`.
+   task's `Started` time, and also the previous task's `Ticked` time when it follows the human's `ok`. Never run a
+   query only to get a timestamp: if none is due, use the next query's timestamp or write `n/a`.
 2. **Re-read the spec sections** the task touches (targets, rules, expectations, acceptance criteria).
 3. **Implement**, following `instructions/data-engineering-conventions.md` and `python-pyspark-conventions.md`.
    Syntax comes from the official `databricks-pipelines` references (`auto-cdc-*.md`, `expectations-*.md`,
@@ -125,7 +126,8 @@ Stop. One paragraph on the mismatch and the proposed amendment. Wait for `approv
 SCD type, sequence column, schedule, targets) also need a goldfish re-review of the diff (`de-sdd-spec`,
 "Amendments"). Then version bump, Decision Log row, `tasks.md` adjusted, continue.
 Any deviation, even an additive one (an extra column, an extra config column), is a Minor amendment row in the
-spec's Decision Log, not only a line in chat or `progress.md`.
+spec's Decision Log, not only a line in chat or `progress.md`. An `ok` to a Validate block ticks the task only; it never
+approves an amendment. Ask for the amendment on its own line ("Reply `approved` to amendment n") and quote that reply.
 
 ## Write-audit-publish (when a target must never show bad data)
 
@@ -151,6 +153,7 @@ anything built that the spec did not request (each with its Decision Log row, or
 any spec-to-code gap as new tasks under "Review fixes" and wait for the user's go.
 
 ## Changelog
+- 0.8.2: an `ok` to a Validate block never approves an amendment (a live test recorded an amendment as approved from a task `ok`); never spend an approval on a timestamp-only query.
 - 0.8.1: stop rule at the top: the Validate block ends the turn (a live test ticked T01 and started T02 in the same turn without `ok`).
 - 0.8.0: live end-to-end test fixes: Validate block never skipped (count-only query and where to run it, never in a pipeline notebook); no row displays to check results; fixture files without overwrite.
 - 0.7.0: time and effort: Started / Verified / Ticked times from `current_timestamp()` folded into existing queries, Time per task row, track Timeline and closing time line.

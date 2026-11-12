@@ -2,7 +2,7 @@
 name: de-goldfish-review
 description: Zero-context "goldfish" review of a data engineering spec before approval (Elephant-Goldfish Model). Use when the user says "goldfish review", "review the spec", "fresh-eyes review", or passes a specs/<track_id>/spec.md path, or a specs/models/*/model.md or specs/ontology/*/ontology.md path (the review is then written next to that file as review_<n>_<email>.md). Must run in a NEW chat with no prior conversation; reads only the spec and the files it references, then writes specs/<track_id>/review_<n>_<email>.md with Blocker / Major / Minor findings, a comprehension paraphrase, and a hidden-assumptions list. Never edits the spec.
 metadata:
-  version: "0.4.0"
+  version: "0.4.1"
 ---
 
 # de-goldfish-review: read only the document, find what the author took for granted
@@ -17,8 +17,8 @@ The author (the "elephant", a Genie Code chat full of project context) wrote
    "Open a new Genie Code chat and run `@de-goldfish-review specs/<track_id>/spec.md`."
 
 2. **Read only**: the spec, `specs/<track_id>/tasks.md` if it exists, `specs/project-profile.md` if the spec links it, and files the spec names explicitly
-   (bundle YAML, existing pipeline code, table DDL). You may run read-only SQL against tables the spec names
-   (`DESCRIBE`, `SELECT ... LIMIT`, `information_schema`). Do not read `.internal_*`, `.challenges_*`, chat history,
+   (bundle YAML, existing pipeline code, table DDL). You may run read-only SQL against tables the spec names to test a
+   claim: metadata (`DESCRIBE`, `information_schema`) and counts or aggregates only; never `SELECT *` or sample rows. Do not read `.internal_*`, `.challenges_*`, chat history,
    or unrelated repo files.
 3. **Never edit the spec.** Output is one file: `specs/<track_id>/review_<n>_<email>.md` (`n` = next free number for
    this reviewer; two people can review concurrently without a name clash).
@@ -81,6 +81,7 @@ Review rounds are capped at 3 per spec version line. If review 3 still has open 
 (approve with the risk recorded in the Decision Log, or rewrite).
 
 ## Changelog
+- 0.4.1: claim checks are metadata and counts only, no `SELECT *` or sample rows (live test printed a gold table).
 - 0.4.0: QA and gap-analysis fixes: tasks map to spec items with no dependency cycles; review rounds capped at 3; also reviews model.md and ontology.md files.
 - 0.3.0: workspace-only: Git folder UI and bundle Deployments panel replace local CLI and CI steps. Goldfish runs only as a new Genie Code chat.
 - 0.2.0: per-reviewer file name; memory disclosure; Blocker / Major / Minor.

@@ -89,3 +89,6 @@ Read before writing pipeline, SQL, bundle or job code. Routed from `AGENTS.md`; 
   table function and fails on classic clusters.
 - Integer checksums over many rows overflow under ANSI mode (`sum(xxhash64(...))`); compare `count(*)` plus a
   `sha2(concat_ws(...))` per row aggregated with `collect_list`/`sort_array`, or cast to `DECIMAL(38,0)` before `sum`.
+- An absence claim ("no column X", "no source for Y") needs `DESCRIBE` of the candidate tables in every layer
+  (bronze, silver, gold); `information_schema` can be incomplete. A live test said "no region field exists anywhere"
+  while `DESCRIBE silver.orders` showed it.
