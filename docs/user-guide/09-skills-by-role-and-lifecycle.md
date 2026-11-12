@@ -2,6 +2,8 @@
 
 This page answers one question: **"I am a <role>, and I am at <stage>. Which skill helps me?"**
 
+This page is a **reference**. You do not need it for your first task.
+
 You still do not need skill names. Type your request in plain words and Genie Code loads the skill. Example requests
 for each role are on [page 8](08-roles.md). The full ShopCo story is on [page 3](03-first-task.md).
 
@@ -69,8 +71,9 @@ the gate; the agent never approves for anyone.
 
 | Role | Stages with a main skill | Main skills |
 |---|---|---|
+| New to data engineering | 4, 5 (small tasks) | `de-sdd-implement`, `de-run-diagnose` (Explain mode), with a lead |
 | Data engineer | 3, 4, 5, 6 | `de-sdd-spec`, `de-sdd-implement`, `de-quality-testing`, `de-run-diagnose`, `de-spark-runtime` |
-| Analytics engineer / BI | 2, 4 | `de-data-modeling` (semantic mode), `de-sdd-implement` |
+| Analytics engineer / BI | 2, 4 | `de-data-modeling` (semantic mode: metrics, descriptions and Genie setup), `de-sdd-implement` |
 | Data architect | 1, 2 | `de-advisor`, `de-cost`, `de-data-contract`, `de-goldfish-review` |
 | Data modeler | 2 | `de-data-modeling`, `de-ontology-design` |
 | Data steward / governance lead | 2, 8 | `de-data-governance` |

@@ -8,7 +8,7 @@ the wrong skill answered. This file is not installed into `.assistant/skills`; i
 
 ## How to run
 
-1. Install the kit (`install/install_skills`). Open a **new** Genie Code chat in agent mode for each prompt.
+1. Install the kit (`install/install_skills`). Open a **new** Genie Code chat for each prompt (Effort: Auto).
 2. Paste the prompt **without** `@`. The point is to test automatic routing. Stop the turn as soon as the first steps
    show.
 3. **Pass:** the steps show "Read `<expected>` skill", or the answer names the expected skill. **Fail:** another skill,
@@ -40,7 +40,7 @@ the wrong skill answered. This file is not installed into `.assistant/skills`; i
 
 ## 2. Prompts per skill
 
-Prompts use the ShopCo example from the user guide (page 3). Each skill has at least two "should load" prompts in
+Prompts use the fictional ShopCo example from the user guide (page 3); it is not a real company. Each skill has at least two "should load" prompts in
 plain user words and at least one "should not load" prompt that sounds similar.
 
 | Skill | Should load | Should not load (expected instead) |
@@ -59,7 +59,7 @@ plain user words and at least one "should not load" prompt that sounds similar.
 | `de-run-diagnose` | "Did my ShopCo pipeline fail?" / "The job is slow today." / "Why are the numbers wrong in gold?" / "Explain this stack trace." / "Explain this query profile." | "Plan a new pipeline." (`de-sdd-spec`) / "Which cluster size should this job use?" (`de-spark-runtime`) |
 | `de-spark-runtime` | "Is cluster etl-nightly oversized?" / "Right-size warehouse sales_wh." / "We run DBR 15.4: which functions should we change, and what would 18 LTS give us?" / "Is input_file_name still supported on our runtime?" | "Explain this stack trace." (`de-run-diagnose`) / "How much will this cost per month?" (`de-cost`) |
 | `de-release-gate` | "Is shop_orders_20261112 ready for production? Go or no-go." / "Review this PR for merge." | "Deploy to prod now." (should refuse and explain the gate; it never deploys) / "Review the spec." (`de-goldfish-review`) |
-| `de-sdd-tracking` | "Where are we on the ShopCo track?" / "Who did what this week?" / "What did we struggle with?" / "How much time did we save this month?" / "Hand over T05 to T07 to ben@shopco.com." | "Is prod ready?" (`de-release-gate`) / "Work on the next task." (`de-sdd-implement`) |
+| `de-sdd-tracking` | "Where are we on the ShopCo track?" / "Who did what this week?" / "What did we struggle with?" / "How much time did we save this month?" / "Hand over T05 to T07 to ben@example.com." | "Is prod ready?" (`de-release-gate`) / "Work on the next task." (`de-sdd-implement`) |
 | `de-databricks-current` | "Convert this DLT code to current syntax." / "What is the new name for Delta Live Tables?" / "Which official reference has the AUTO CDC syntax?" | "Design the star schema." (`de-data-modeling`) |
 
 ## 3. Look-alike pairs (test both sides when either description changes)

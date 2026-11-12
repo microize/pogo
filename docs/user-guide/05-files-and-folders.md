@@ -1,6 +1,7 @@
 # 5. Files and folders in a project
 
-The agent writes these files. You rarely edit them by hand; you read and review them. Here is the ShopCo project after
+The agent writes these files. You rarely edit them by hand; you read and review them. `.yml` / `.yaml` files are
+settings files; `.md` files are plain text documents. Here is the ShopCo project after
 the work on [page 3](03-first-task.md):
 
 ```
@@ -17,10 +18,10 @@ shopco-orders/
   specs/
     project-profile.md              platform, owner team, environments, conventions, productivity target
     env/dev-sales.md                what dev allows, plus the admin checklist          (de-env-check)
-    decisions/ADR-001-auto-loader.md   an accepted recommendation                        (de-advisor)
+    decisions/ADR-001-auto-loader.md   an accepted recommendation (ADR = architecture decision record)  (de-advisor)
     models/sales/model.md           data model, metrics, Genie Agent setup, diagram      (de-data-modeling)
     ontology/sales/ontology.md      business concepts and links (if asked)              (de-ontology-design)
-    contracts/fact_orders.yaml      data contract                                        (de-data-contract)
+    contracts/fact_orders.yaml      data contract: what the table promises its users     (de-data-contract)
     governance/
       taxonomy.md                   which tags exist and who owns what                   (de-data-governance)
       history.md                    governance score over time
@@ -39,11 +40,11 @@ shopco-orders/
       impact_1.md                   what breaks if a table changes                       (de-data-contract)
       pr_review_1.md                merge review                                         (de-release-gate)
       release_1.md                  production check: GO / CONDITIONAL_GO / NO_GO
-  .internal_asha@shopco.com/        Asha's own records (one folder per person)          (de-sdd-tracking)
+  .internal_asha@example.com/        Asha's own records (one folder per person)          (de-sdd-tracking)
     index.md                        Asha's tracks and their status
     worklog.md                      time for work outside a track (advice, models, audits)
     shop_orders_20261112/progress.md   evidence, timeline and time per task
-  .challenges_asha@shopco.com/      where the agent struggled, with the lesson
+  .challenges_asha@example.com/      where the agent struggled, with the lesson
     shop_orders_20261112.md
 ```
 
@@ -63,11 +64,11 @@ shopco-orders/
 
 | Where | Values |
 |---|---|
-| spec header | DRAFT, IN_REVIEW, APPROVED, IN_PROGRESS, BLOCKED, ON_HOLD, COMPLETE, ABANDONED, SUPERSEDED |
+| spec header | the ones you will see most: **DRAFT** (being written), **APPROVED** (you said `approved`), **COMPLETE** (done). Others: IN_REVIEW, IN_PROGRESS, BLOCKED, ON_HOLD, ABANDONED, SUPERSEDED |
 | task line | `[ ]` to do, `[~]` in progress, `[x]` done, `[!]` blocked |
 | release check | GO, CONDITIONAL_GO, NO_GO |
 | review findings | Blocker (must fix), Major (should fix), Minor (nice to fix) |
-| governance band | Gold (90+), Silver (75+), Bronze (50+), Ungoverned (below 50) |
+| governance score band | Strong (90+), Good (75+), Weak (50+), Ungoverned (below 50); not the same as the bronze / silver / gold table layers |
 
 ## Privacy of the record folders
 

@@ -2,7 +2,8 @@
 
 Everything happens in the Databricks workspace, in your browser. Nobody installs anything on a laptop.
 
-There are three levels. Ask your lead which ones are already done. As an engineer, you usually only do level C.
+There are three levels. Ask your lead which ones are already done. As an engineer, you usually only do level C:
+**skip A and B unless you are the admin or the lead.** New words are explained on [page 0](00-basics.md).
 
 | Level | Who | How often | ShopCo example |
 |---|---|---|---|
@@ -32,13 +33,13 @@ There are three levels. Ask your lead which ones are already done. As an enginee
 
 1. Create a **Git folder** for the project (Workspace > Create > Git folder). A plain folder also works, but a Git
    folder gives you history and pull requests.
-   *ShopCo:* `/Users/lead@shopco.com/shopco-orders`.
+   *ShopCo:* `/Users/lead@example.com/shopco-orders`.
 2. Copy three things from the kit's Git folder into the project's root: `AGENTS.md`, the `instructions/` folder and
    an empty `specs/` folder. Save them with the Git dialog: **Commit & Push**.
 3. Fill in the last section of `AGENTS.md`, "Project conventions":
    *ShopCo:* dev catalog `dev_shop`, schemas `bronze_sales`, `silver_sales`, `gold_sales`, pipeline language SQL,
-   topology `git-folder`.
-4. Open any file in the project, start a Genie Code chat and type:
+   topology `git-folder` (how teammates share files: here, through the Git folder).
+4. Open a notebook in the project (attached to the team's SQL warehouse), start a Genie Code chat and type:
    ```
    check this workspace's readiness for data engineering
    ```
@@ -51,16 +52,22 @@ There are three levels. Ask your lead which ones are already done. As an enginee
 
 ## C. You (each person)
 
-1. Check that you can open the project Git folder and that Genie Code is on (the sparkle icon on the right of the
-   editor).
-2. In the editor's compute selector, attach your team's **SQL warehouse**. The agent runs its checks there. Do not use
-   another team's cluster.
-3. Read [page 3](03-first-task.md) once.
+1. Ask your lead for the **project folder path** and your **team's SQL warehouse name**. Open the folder from the left
+   sidebar > **Workspace**. Check that Genie Code is on: the sparkle icon on the right of a notebook or file.
+2. In the project folder, open a notebook (or create an empty one called `chat`). In the **compute selector** (the
+   drop-down at the top right), choose your team's **SQL warehouse** (compute that runs SQL). Start your Genie Code
+   chats from this notebook; the agent runs its checks on that warehouse. Do not use another team's compute.
+3. Learn three habits, explained on [page 0](00-basics.md#6-where-to-click):
+   - click **Accept all** after the agent writes files, or the changes are lost;
+   - **Allow** only reading queries; **Skip and ask** when unsure (safety rules on page 0);
+   - run each Validate query in the SQL editor before replying `ok`.
+4. Read [page 3](03-first-task.md) once.
 
-Some steps are buttons that only you can press: pull, commit and push, and deploy a bundle to dev. The agent tells you
-when.
+Some steps are buttons that only you can press: **Pull**, **Commit & Push**, and **Deploy** to dev. The agent tells you
+when; [page 3, step 7](03-first-task.md#step-7-press-the-buttons-only-you-can-press) shows where to click. Ask your
+lead whether you may deploy to dev yourself.
 
-**No serverless?** Deploying from the Git folder's **Deployments** panel needs serverless compute. Without it, the agent
+**No serverless?** (Your environment file in `specs/env/` says so. If you are not sure, skip this.) Deploying from the Git folder's **Deployments** panel needs serverless compute. Without it, the agent
 creates the dev jobs through the Jobs API, after you approve each call, and writes that choice into the spec.
 
 ## How to know setup is complete
@@ -71,4 +78,4 @@ creates the dev jobs through the Jobs API, after you approve each call, and writ
 | Install verified | last cell of `install/install_skills` | `32 ok, 0 failed` |
 | Project rules read | ask "what are the rules of this project?" in a chat opened from a project file | it quotes `AGENTS.md` |
 | Environment known | `specs/env/` in the project | a file for your environment and team, with nothing blocking your goal |
-| Git works | Git dialog of the project folder | your branch; **Pull** succeeds |
+| Git works | Git dialog of the project folder (click the branch name at the top of a file) | the branch name your lead gave you; **Pull** succeeds |

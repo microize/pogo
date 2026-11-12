@@ -10,6 +10,18 @@ Find your role. Each section says, in plain words:
 
 You never need skill names. Type the request and Genie Code loads the right skill.
 
+## New to data engineering
+
+- **You are:** new to the field; maybe your Databricks knowledge is a short class.
+- **Read first:** [page 0: Basics](00-basics.md), then [page 1](01-what-is-this.md).
+- **Type first:** ask about data that already exists. It changes nothing:
+  ```
+  what is in dev_shop.silver_sales.orders, where does it come from, and what does one row mean?
+  ```
+- **Then:** ask your lead for a **small** task (one table or one rule), and follow the Data engineer steps (4 to 8) on
+  [page 3](03-first-task.md). Type `defaults` when you are unsure about a question.
+- **You approve:** each task's Validate check (run the query; reply `ok` only if the result matches).
+
 ## Data engineer
 
 - **You do:** build and run the pipelines, keep them healthy and efficient.
@@ -49,6 +61,8 @@ You never need skill names. Type the request and Genie Code loads the right skil
   ```
   advise: Lakeflow Connect, Auto Loader or Zerobus for ShopCo's order events at 2,000 per second?
   ```
+- (Lakeflow Connect, Auto Loader and Zerobus are three Databricks ways to bring data in: from other systems, from
+  files, and as a live stream of events.)
 - **What happens:** `de-advisor` compares options for your real environment (`de-env-check`), with cost and time
   (`de-cost`), and says which features are GA or Preview. For changes to shared tables, `de-data-contract` writes the
   contract and an impact report. For specs written by others, run a fresh-eyes review in a new chat
@@ -84,7 +98,8 @@ You never need skill names. Type the request and Genie Code loads the right skil
   governance audit of dev_shop: owners, descriptions, sensitive data, and which sensitive columns are not protected
   ```
 - **What happens:** `de-data-governance` reads only metadata (names, tags, owners, counts; never data rows). It scores
-  every table against 22 checks based on the EDM Council's CDMC controls, rates maturity, and lists fixes, most risky
+  every table against 22 checks based on CDMC (a widely used checklist for managing data in the cloud, from the EDM
+  Council), rates maturity (how complete governance is, from 0 to 5), and lists fixes, most risky
   first: sensitivity tags, masks and access policies, group owners, stewards, certification. You reply `approved`; the
   owner or admin runs `apply_<n>.sql`; then `recheck governance of dev_shop` shows the score move.
 - **Also useful:** `propose a tag taxonomy for our catalogs`, `who should own and look after the sales schemas?`,
@@ -119,7 +134,8 @@ You never need skill names. Type the request and Genie Code loads the right skil
   ```
 - **What happens:** `de-env-check` lists compute per workload, quota, catalogs and system tables, and writes a
   checklist of what only you can enable. Install or update the kit with `install/install_skills` (scope `workspace`).
-- **Also useful:** `which clusters are idle or running jobs on all-purpose compute?` (`de-spark-runtime`).
+- **Also useful:** `which clusters are idle or running jobs on all-purpose compute?` (shared notebook clusters, which
+  cost more for scheduled work) (`de-spark-runtime`).
 - **You get:** `specs/env/<env>-<team>.md`.
 
 ## Business / product owner

@@ -1,6 +1,7 @@
 # 4. Everyday use: what to type
 
-Before you start: open a file inside the project, then start a **new chat** for each new piece of work. Write in plain
+Before you start: open a notebook inside the project folder (create an empty one called `chat` if there is none),
+attach your team's SQL warehouse, then start a **new chat** for each new piece of work. New words are explained on [page 0](00-basics.md). Write in plain
 words. If the chat might not know the project, add its path.
 
 ## Three sizes of work
@@ -23,7 +24,7 @@ All three need your `approved` before any code is written.
 | `enough` | stop asking questions and write the spec |
 | `approved` | approve the spec or a change to it (only this word counts, not "ok") |
 | `goldfish` | ask for a fresh-eyes review before approving |
-| `resolve review` | go through the review findings and propose fixes |
+| `resolve review 1` | go through the findings of review number 1 and propose fixes |
 | `ok` | the task's Validate check looks right: tick it and continue |
 | `auto` | tick tasks whose checks passed without waiting for me |
 | `next` | continue with the next task |
@@ -36,6 +37,8 @@ All three need your `approved` before any code is written.
 
 | Situation | Example |
 |---|---|
+| Understand a table | `what is in dev_shop.silver_sales.orders and where does it come from?` |
+| See where work stands | `status of shop_orders_20261112` |
 | New pipeline or table | `build a pipeline that loads the daily ShopCo order JSON from /Volumes/dev_shop/raw/orders/ into bronze, silver and gold` |
 | Small change | `add a region column to silver orders from the shipping region field (small change)` |
 | Production bug | `hotfix: gold fact_orders counts cancelled orders twice` |
@@ -55,7 +58,7 @@ All three need your `approved` before any code is written.
 | Contract and impact | `write the data contract for gold fact_orders and tell me what breaks if we drop region` |
 | Before merging | `review shop_orders_20261112 for merge` |
 | Before production | `is shop_orders_20261112 ready for production?` |
-| Hand work to a teammate | `hand over T05 to T07 of shop_orders_20261112 to ben@shopco.com` |
+| Hand work to a teammate | `hand over T05 to T07 of shop_orders_20261112 to ben@example.com` |
 | Workspace problems | `check this workspace's readiness`, or later `recheck` |
 | Time saved | `productivity report for me, last 30 days` |
 | Old price list | `refresh prices` |
@@ -66,16 +69,16 @@ All three need your `approved` before any code is written.
 - **Tasks have owners.** The agent writes your email on a task before it works on it, and skips tasks someone else
   owns.
 - **Git folder:** in the folder's Git dialog, click **Pull** before you start and **Commit & Push** after each ticked
-  task. The agent suggests the message, for example `feat(shop_orders_20261112): T03 bundle`. A job runs whatever is in
-  the Git folder, so keep it at a ticked, committed state.
+  task. The agent suggests the message, for example `feat(shop_orders_20261112): T03 bundle`. Scheduled runs use the
+  files in the Git folder, so commit only work whose task is ticked.
 - **Plain folder:** the agent re-reads a file just before saving, so it does not overwrite a teammate's change.
 - **Going on leave?** Ask for a handover. The agent writes a note with everything the next person needs and moves your
   open tasks to them.
 
 ## Time and estimates
 
-The agent records when each task starts and finishes, using the workspace clock. It adds `current_timestamp()` to a
-query it was going to run anyway, so you get no extra approval prompts.
+The agent records when each task starts and finishes, using the time from Databricks itself (not a guess). This adds
+no extra Allow / Skip prompts.
 
 With the task list, it suggests a **manual estimate** per task (how long it would take by hand). Correct any that look
 wrong in the same reply. After advice, a model, a diagnosis or other work outside a track, it ends with a line like:
@@ -88,12 +91,12 @@ people.
 
 ## Approvals inside Genie Code
 
-Genie Code asks **Allow / Skip** before it runs SQL or calls an API. Read the short code, then allow.
+Genie Code asks **Allow / Skip** before it runs anything. Use the one rule on
+[page 0, section 7](00-basics.md#7-two-safety-rules). In short: allow reading; allow dev changes inside an approved task;
+skip anything not dev, anything that deletes or changes permissions, and anything you are unsure about.
 
-- Read-only queries (`SELECT`, `SHOW`, `DESCRIBE`, `LIST`) are safe.
-- Be careful with anything that writes. Refuse anything outside dev.
-- There is an **Auto-approve** switch for one chat, in the drop-down of a pending step. Use it only if your team
-  agreed, and never in a workspace with production data.
+There is an **Auto-approve** switch for one chat. Do not use it until your lead says so, and never where there is
+production data.
 
 ## Habits that save time
 

@@ -3,7 +3,7 @@
 This page follows one common piece of work from the first question to production. Each step shows **what you type**,
 **what the agent does**, and **what you get**. Use the same steps for your own work.
 
-**The need.** ShopCo, a small online shop, receives files every day:
+**The need.** ShopCo, a made-up small online shop (not a real company), receives files every day:
 
 - order files (JSON) in `/Volumes/dev_shop/raw/orders/`,
 - a customer file (CSV) in `/Volumes/dev_shop/raw/customers/`, with names, email addresses and phone numbers.
@@ -17,6 +17,25 @@ answers questions and approves the plan. In a small team, one person can wear se
 
 Steps 4 to 8 are shortened from a real test run. The outputs in the other steps are illustrations of what the
 skills produce; your numbers will differ.
+
+**Which steps are yours?**
+
+| Steps | Who | New data engineer? |
+|---|---|---|
+| 0, 1 | lead or architect | read only |
+| 2 | analytics engineer | read only |
+| 3 | data steward | read only |
+| **4, 5, 6, 7, 8** | **data engineer** (5: the business owner approves) | **these are yours: do them** |
+| 9 | experienced data engineer | optional, later |
+| 10 | tech lead | read only |
+| 11 | everyone | try `status` |
+
+New words? See [page 0: Basics](00-basics.md).
+
+> **If your task is small** (one table or one rule, which is what a first task should be), steps 4 to 8 are shorter:
+> the agent asks fewer questions, there is **no** fresh-eyes review (skip the goldfish part of step 5), there are only
+> about 3 tasks (set-up, one build, one test), and you do not need a model file from step 2. Start your request with
+> "small change:", for example `small change: add a region column to silver orders`.
 
 ---
 
@@ -33,6 +52,8 @@ check this workspace's readiness for data engineering
 Serverless jobs and pipelines: yes.  SQL warehouse: sales_wh (2X-Small, auto-stop 10 min).
 System tables: system.access granted; system.billing NOT granted  -> admin checklist item 1.
 ```
+In plain words: you can run serverless work; your team's SQL warehouse is the smallest size and stops after 10 idle
+minutes; the agent can read usage history but not cost data until the admin gives access.
 
 ## Step 1. Ask for advice (optional)
 
@@ -43,7 +64,9 @@ advise: what is the best way to load new daily JSON files from a volume?
 **The agent** compares options for your environment, with cost and time, and says what is GA or still Preview.
 
 **You get** a recommendation: "Auto Loader inside a Lakeflow pipeline on serverless. It picks up only new files,
-handles schema changes, and costs about 0.20 USD per daily run." If you accept, it saves a decision record in
+handles schema changes, and costs about 0.20 USD per daily run." In plain words: use the Databricks feature that loads
+each new file once, run it as a pipeline on compute Databricks manages, and it still works when the files gain new
+columns. If you accept, it saves a decision record in
 `specs/decisions/`.
 
 ## Step 2. Design the model and the metrics (analytics engineer)
@@ -61,7 +84,8 @@ Genie should answer questions for sales managers.
   "sales" for revenue,
 - a Genie Agent "Sales questions" on the metric view, with 5 test questions and their expected answers.
 
-**You get** `specs/models/sales/model.md` with a diagram and checks. Reply `approved` to accept it.
+**You get** `specs/models/sales/model.md` with a diagram and checks. (Grain = what one row means. Metric view = a
+saved formula for business numbers, so everyone gets the same revenue.) Reply `approved` to accept it.
 
 ## Step 3. Check governance of the sensitive data (data steward)
 
@@ -77,19 +101,25 @@ F2 Major    3 tables owned by a person, not a group.
 Proposal: tag email and phone  sensitivity=restricted, personal_data=direct;
           add a column-mask policy for everyone except the group sales_pii_readers.
 ```
+In plain words: label email and phone as highly sensitive, and hide their real values from everyone except a small
+group of people who are allowed to see them.
 **You get** `specs/governance/dev_shop/assessment.md` and `apply_1.sql`. The agent does **not** run it. After your
 `approved`, the table owner runs the tag statements and the admin runs the policy.
 
 ## Step 4. Ask for the pipeline and answer the questions (data engineer)
 
-Open any file in the project (this is how Genie Code finds `AGENTS.md`), start a **new chat** and **type:**
+Open your `chat` notebook in the project folder with your warehouse attached (this is how Genie Code finds the project
+rules in `AGENTS.md`), start a **new chat** and **type** (use your own project folder path):
 ```
 build the ShopCo sales pipeline: daily orders JSON from /Volumes/dev_shop/raw/orders/ and customers CSV from
 /Volumes/dev_shop/raw/customers/, into bronze, silver and gold, using the approved model specs/models/sales/model.md.
-Project folder: /Users/asha@shopco.com/shopco-orders
+Project folder: <your project folder path>
 ```
 **The agent** loads `de-sdd-spec`. It looks at the files first. Example: it notices that amounts are stored as text,
-times carry time-zone offsets, and two rows are broken. Then it asks:
+times carry time-zone offsets, and two rows are broken. Then it asks a few questions.
+
+**Not sure what to answer? Type `defaults`.** Every question has a recommended answer, chosen to be the safe one.
+Example questions:
 ```
 1. Customer history in silver?        a. SCD Type 2 (recommended)  b. SCD Type 1
 2. Broken rows?                       a. keep them aside in a quarantine table (recommended)  b. drop them
@@ -98,6 +128,7 @@ times carry time-zone offsets, and two rows are broken. Then it asks:
 5. Email and phone in gold?           a. leave them out of gold (recommended)  b. keep them, masked
 ```
 **You type:** `defaults` (accept all suggestions), or answer by number: `1a, 2a, 3a, 4b Europe/Berlin, 5a`.
+(SCD 2 = keep every change of a customer, with dates. Quarantine = a side table for broken rows, so they are not lost.)
 Add anything else it should know. Type `enough` when you want the draft.
 
 ## Step 5. Read the spec, get a fresh-eyes review, approve (business owner and engineer)
@@ -112,7 +143,8 @@ For a bigger piece of work like this one, get a second opinion first. Open a **n
 The review might say: "Blocker: the spec does not say what happens to orders that arrive a day late." Go back to the
 first chat and type `resolve review 1`. The agent proposes a fix for each finding.
 
-When the summary looks right, reply:
+**Who types `approved`?** Ask your lead before you start. Often the lead or the business owner approves, not you. If
+it is you, type it only after reading the whole summary. When the summary looks right, the approver replies:
 ```
 approved
 ```
@@ -121,12 +153,15 @@ Only this word counts. "ok" or "looks fine" makes the agent ask again. This is o
 ## Step 6. Let it build, and validate each task
 
 **The agent** writes `plan.md` and `tasks.md` (T01 to T12, each with an estimate of how long it would take by hand).
-Correct any estimate that looks wrong. Then it works through the tasks without you typing `next`. After each task:
+Correct any estimate that looks wrong, or leave them if you are unsure; your lead can correct them later. Then it works through the tasks without you typing `next`. After each task:
 ```
 T04 done (verified): bronze_sales.orders has 8 rows from 2 files; 0 rows in _rescued_data.
 Validate: SELECT count(*) FROM dev_shop.bronze_sales.orders     Expected: 8
 Reply ok to tick and continue, fix <what> to change it, auto, or stop.
 ```
+`_rescued_data` is a column where Databricks keeps values that did not fit the expected format; 0 rows there means
+nothing was lost. **To check:** copy the `SELECT`, open the **SQL Editor** (left sidebar), choose your team's
+warehouse, click **Run**, and compare with Expected.
 - `ok`: you agree. It ticks the task and moves on.
 - `fix ...`: say what is wrong, in plain words.
 - `auto`: from now on, it ticks tasks whose checks passed without waiting (you still see each Validate note).
@@ -134,13 +169,16 @@ Reply ok to tick and continue, fix <what> to change it, auto, or stop.
 
 ## Step 7. Press the buttons only you can press
 
-1. **Deploy to dev.** Open `databricks.yml` in the project Git folder, click the **Deployments** icon (the rocket),
-   choose the `dev` target, click **Deploy**. Paste the result (success or the error text) into the chat.
-2. **Commit and push.** Open the Git dialog, look at the changes, use the message the agent suggests (for example
+1. **Deploy to dev** (only if your lead lets you). Open `databricks.yml` in the project Git folder, click the
+   **Deployments** icon (the rocket, [picture](00-basics.md#what-these-screens-look-like)), choose `dev` (the *target*: which environment to create things in), click
+   **Deploy**. Paste the result (success or the error text) into the chat. **Not allowed to deploy?** Tell the agent
+   `my lead will deploy`, send your lead the message the agent prepares, and type `check` when the lead confirms.
+2. **Commit and push.** Open the Git dialog (click the branch name at the top of any file in the Git folder), look at
+   the changes, use the message the agent suggests (for example
    `feat(shop_orders_20261112): T03 bundle`), and click **Commit & Push**.
 
-The agent groups these, so you stop only once or twice. On a classic cluster a pipeline run can take about 10 minutes
-to start; the agent says `say check in about 10 minutes`. Come back and type `check`.
+The agent groups these, so you stop only once or twice. Only if your `specs/env/` file says there is no serverless:
+on a classic cluster a pipeline run can take about 10 minutes to start; the agent says `say check in about 10 minutes`. Come back and type `check`.
 
 ## Step 8. When something fails, it explains and fixes
 
@@ -155,11 +193,13 @@ and asks you.
 
 You can also ask it to explain anything yourself:
 ```
-explain this query profile        (paste the JSON from Query History > Download)
+explain this query profile        (left sidebar > Query History > click the query > download the profile, paste it)
 why is stage 12 so slow?          (paste the stage summary from the Spark UI)
 ```
 
-## Step 9. Tune compute and code (data engineer)
+## Step 9. Tune compute and code (experienced data engineer; optional)
+
+Skip this step on your first task. It is shown so you know it exists.
 
 After a week of daily runs, **type:**
 ```
@@ -191,7 +231,7 @@ project's Git folder in the **prod** workspace. The agent never deploys to produ
 | You type | You get |
 |---|---|
 | `status of shop_orders_20261112` | done, in progress, blocked, who owns what |
-| `hand over T10 to T12 to ben@shopco.com` | a handover note and new owners on those tasks |
+| `hand over T10 to T12 to ben@example.com` | a handover note and new owners on those tasks |
 | `recheck governance of dev_shop` | the new score next to the old one |
 | `we want to drop the region column: what breaks?` | an impact report from lineage (`de-data-contract`) |
 | `productivity report for shop_orders_20261112` | for example: "6 h 40 min with the agent vs a 32 h manual estimate; 2 fix cycles; 1 amendment" |

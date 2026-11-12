@@ -36,7 +36,7 @@ Which skill covers which lifecycle stage for each role: [docs/user-guide/09-skil
 
 ## How it works
 
-Every step (install, specs, build, test, commit, deploy) is done in the workspace: Genie Code in agent mode, notebooks,
+Every step (install, specs, build, test, commit, deploy) is done in the workspace: Genie Code, notebooks,
 the SQL editor, the Lakeflow Pipelines Editor, Git folders and the bundle Deployments panel. No laptop, local CLI or
 CI is needed. Each skill follows the open [Agent Skills](https://agentskills.io) standard: a folder with a `SKILL.md`
 whose frontmatter has `name` and `description`.
@@ -148,7 +148,7 @@ Genie Code discovers skills in `/Users/<your-email>/.assistant/skills/` (persona
    `/Workspace/.assistant_workspace_instructions.md` from `instructions/genie-code-user-instructions.md`). Both scopes
    write a `_VERSION` stamp next to the skills. `include_official` = `yes` (default) also installs the official skills. Optional
    `dry_run` = `yes` shows what would change. Run all.
-4. The last cell prints `32 ok, 0 failed`. Start a **new** Genie Code chat in agent mode (hard-refresh the browser if
+4. The last cell prints `32 ok, 0 failed`. Start a **new** Genie Code chat (hard-refresh the browser if
    the skills do not appear). Skills load by description, or mention them with `@de-sdd-spec`.
 
 To update: pull in the Git folder dialog, re-run the notebook.

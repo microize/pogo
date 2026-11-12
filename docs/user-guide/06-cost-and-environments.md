@@ -19,7 +19,7 @@ very different. For example, dev may have no serverless compute while prod has i
 
 - Use only your team's compute: your SQL warehouse and your cluster policies. Another team's running cluster is not
   free capacity. The agent will never start, stop or attach it.
-- Cloud quotas (for example 10 vCPUs in a region) are shared by everyone in the cloud subscription. If a run is
+- Cloud quotas (a limit on machines, for example 10 vCPUs, meaning virtual processor cores, in one region) are shared by everyone in the cloud subscription. If a run is
   "waiting for resources", someone else may be using the quota. Agree on a split with the other team; the environment
   file records it.
 
@@ -27,7 +27,8 @@ very different. For example, dev may have no serverless compute while prod has i
 
 Ask in plain words: `how much will this cost per month?`, `serverless or classic?`, `which warehouse size?`
 
-How the estimate works (`de-cost`):
+How the estimate works (`de-cost`). A **DBU** (Databricks Unit) is how Databricks measures usage for billing:
+bigger or longer-running compute uses more DBUs.
 
 | Compute | Cost per run |
 |---|---|
@@ -38,20 +39,20 @@ How the estimate works (`de-cost`):
 "Hours" includes start-up and idle time. In our test, a classic cluster took about 10 minutes to start for a 1-minute
 job, so start-up was most of the cost.
 
-**Example from our test** (Azure East US 2, list prices): the daily pipeline on 2 D4ds_v4 machines cost about 0.22 USD
-per run, about 6.60 USD a month. Keeping the same cluster running all the time would cost about 921 USD a month.
+**Example from our test** (Azure East US 2, list prices): the daily pipeline on two mid-size machines (type D4ds_v4)
+cost about 0.22 USD per run, about 6.60 USD a month. Keeping the same cluster running all the time would cost about 921 USD a month.
 
 **While you build**, agent turns and SQL warehouse time usually cost more than the pipeline runs. To keep this down:
 
 - set the warehouse auto-stop low (a few minutes),
 - ask the agent to combine its checks into fewer queries,
-- attach your own compute to the notebook you chat from.
+- keep your team's SQL warehouse attached to the notebook or file you chat from (page 2), instead of a big cluster.
 
 Good to know:
 
 - Prices come from a **dated price file** in the kit (`skills/de-cost/references/prices/azure-<region>.json`). The agent
   always tells you the date. These are list prices: no company discounts, no taxes.
-- To update prices: type `refresh prices` in a chat that has Python compute with internet access. Or a maintainer runs
+- (For maintainers.) To update prices: type `refresh prices` in a chat that has Python compute with internet access. Or a maintainer runs
   `skills/de-cost/scripts/refresh_prices.py --region <region>` from a notebook cell in the kit's Git folder, commits the
   new file, and re-runs `install/install_skills`.
 - Real spend is in the `system.billing` tables, if your admin has given you access.
@@ -80,8 +81,9 @@ If you accept, it saves the decision in `specs/decisions/` so the next person kn
 
 - for **new** work, asks about the workload and recommends compute. Serverless is the default; a classic cluster only
   when something needs it (for example R code);
-- for **existing** work, reads real usage (CPU, memory, spill, queue time) from the system tables and says
-  "oversized", "memory-bound", "idle" and so on, with the numbers. It needs at least 3 normal runs before it proposes a
+- for **existing** work, reads real usage from the system tables (how busy the machines were, whether data ran out of
+  memory and *spilled* to disk, how long queries *queued* waiting for compute) and says "too big", "not enough memory",
+  "idle" and so on, with the numbers. It needs at least 3 normal runs before it proposes a
   change;
 - checks the **runtime version**: support end dates, and what an upgrade would bring or break;
 - checks your **code against the Spark version** it runs on: what to use now, what to stop using, what a newer version
