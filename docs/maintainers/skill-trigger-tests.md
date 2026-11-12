@@ -86,3 +86,23 @@ These are the requests most likely to go to the wrong skill.
 
 | Date | `_VERSION` | Skill | Prompt | Loaded | Pass |
 |---|---|---|---|---|---|
+| 2026-11-12 | 32 ok | de-databricks-current | new name for DLT, convert dlt code | yes | pass |
+| 2026-11-12 | 32 ok | de-env-check | check this workspace's readiness | yes | pass (fixed CLI advice, 0.4.1) |
+| 2026-11-12 | 32 ok | de-advisor | Auto Loader or Lakeflow Connect for daily JSON files? | no | **fail** |
+| 2026-11-12 | after 7a99472 | de-advisor | same prompt | yes | pass (description 0.5.2) |
+| 2026-11-12 | 32 ok | de-cost | monthly cost, classic vs serverless | yes | pass |
+| 2026-11-12 | 32 ok | de-data-modeling | star schema, bus matrix, grain | yes | pass |
+| 2026-11-12 | 32 ok | de-ontology-design | concepts, properties, relationships | yes | pass (about 12 approvals; batched in 0.1.2) |
+| 2026-11-12 | 32 ok | de-sdd-tracking | where are we, who did what | yes | pass |
+| 2026-11-12 | 32 ok | de-release-gate | ready for production? go or no-go | yes | pass (fixed CLI advice, 0.6.2) |
+| 2026-11-12 | 32 ok | de-sdd-spec | new requirement, first questions | yes | pass |
+| 2026-11-12 | 32 ok | de-data-contract | drop region: what breaks downstream? | yes | pass |
+| 2026-11-12 | 32 ok | de-quality-testing | DQ rules and quarantine for payments | yes | pass |
+| 2026-11-12 | 32 ok | de-run-diagnose | explain this stack trace (UNRESOLVED_COLUMN) | no | **fail** |
+| 2026-11-12 | after 7a99472 | de-run-diagnose | same prompt | no | **fail** (works with `@de-run-diagnose`; known limitation) |
+| 2026-11-12 | 32 ok | de-spark-runtime | DBR 15.4 to 18 LTS, input_file_name | yes | pass |
+| 2026-11-12 | 32 ok | de-data-governance | quick check: tables with no description, unmasked sensitive columns | no | **fail** |
+| 2026-11-12 | 32 ok | de-data-governance | run a governance audit of catalog ... | yes | pass |
+| 2026-11-12 | after 7a99472 | de-data-governance | quick check (same as the fail) | yes | pass (description 0.1.2) |
+| 2026-11-12 | 32 ok | de-goldfish-review | goldfish review of the track's spec | yes | pass |
+| 2026-11-12 | 32 ok | de-sdd-implement | implement the next task (dry run) | yes | pass |

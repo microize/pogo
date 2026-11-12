@@ -11,6 +11,7 @@ status) and **Catalog Explorer** (left sidebar > Catalog: catalogs, schemas, tab
 | What you see | Why | What to do |
 |---|---|---|
 | No "Read de-... skill" step; the answer is generic | the skills are not installed for you, or the chat started before they were | type `@de-` in a **new** chat; if nothing shows, ask the admin to install (setup A) |
+| The answer looks fine but there is no "Read de-... skill" step (short questions, a pasted error) | Genie Code answered by itself without the skill | type `@` and the skill name, pick the row that shows the skill's description (not a folder row), then your question ([picture](10-skills-in-action.md)) |
 | A different skill answered than you expected | your words matched another skill | start the request with the skill name, for example `@de-spark-runtime is this cluster too big?` |
 | It refuses to write code | the spec is not approved yet (on purpose) | reply `approved` to the spec summary, or ask for an example in chat only |
 | It writes files in your home folder instead of the project | it did not know the project folder | chat from a notebook inside the project folder, and mention the project path |

@@ -54,10 +54,12 @@ Every page uses the same example, so you can follow one story:
 | 7 | [Troubleshooting and FAQ](07-troubleshooting.md) | when something looks stuck or wrong |
 | 8 | [Roles: where to start](08-roles.md) | to find your starting point if you are not a data engineer |
 | 9 | [Skills by role and lifecycle stage](09-skills-by-role-and-lifecycle.md) | to see which skill helps you at each stage |
+| 10 | [Skills in action](10-skills-in-action.md) | to see a real screenshot of each skill and how it was tested |
 
 ## Five rules to remember
 
-1. **Say what you need in plain words.** You do not need skill names. Genie Code picks the right skill.
+1. **Say what you need in plain words.** You do not need skill names. Genie Code picks the right skill. If you see
+   no "Read de-... skill" step, start again with `@` and the skill name ([page 10](10-skills-in-action.md)).
 2. **Nothing is built until you reply `approved`.** Read the spec summary first. "ok" or "looks fine" does not count.
 3. **Check each step.** After each task you get a short "Validate" note with a query and the expected result. Run the
    query in the SQL editor ([how](00-basics.md#7-two-safety-rules)); if the result matches, reply `ok`.
