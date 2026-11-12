@@ -2,7 +2,7 @@
 name: de-sdd-spec
 description: Spec-driven intake for Databricks data engineering work. Use when the user brings a new requirement or a change to an existing pipeline or table ("add a new source / file / table to our pipeline", "integrate X", "add a column", "change how X is calculated", "backfill"), or says "spec this", "write the spec", "requirement", "greenfield", "brownfield", "new track", "hotfix track", or asks to plan a data product before building it. Runs discovery, asks clarifying questions in rounds, writes specs/<track_id>/spec.md, waits for the user's explicit approval, resolves goldfish reviews, then produces plan.md and tasks.md. Never writes pipeline code. For syntax or building an already-approved pipeline use the official databricks-pipelines skill or de-sdd-implement.
 metadata:
-  version: "0.7.0"
+  version: "0.7.1"
 ---
 
 # de-sdd-spec: requirement to approved spec
@@ -72,7 +72,8 @@ and contact channel; contracts and alerts need it).
 `Status: DRAFT`, `Type: full|small|hotfix`, `Version: 1`. Mandatory for data projects: `T-xx` transformation blocks,
 the requirement traceability table (every KPI maps to a table and column; a GAP blocks approval), the **known test
 gaps** section (behaviours the test data cannot exercise, each with a planned fixture or an accepted risk), acceptance criteria
-as runnable queries, and all names taken from the user's answers. Present a summary in chat and ask:
+as runnable queries, and all names taken from the user's answers. Present a summary in chat (for `small` and `hotfix`:
+ending with the numbered task list, one line per task) and ask:
 **"Reply `approved` to approve, `goldfish` for a fresh-eyes review (recommended for full tracks), or tell me what to change."**
 
 ### 3b. Goldfish review (Elephant-Goldfish Model)
@@ -144,6 +145,7 @@ Reviewing your own spec in the same chat and calling it a goldfish review. Setti
 verbatim reply in the Decision Log.
 
 ## Changelog
+- 0.7.1: the small / hotfix approval summary ends with the task list (live test: one summary had it, another did not).
 - 0.7.0: live end-to-end test fixes: triggers for changes to an existing pipeline; this skill never builds: after approval it writes `tasks.md` (small / hotfix: drafted with the spec, approved together) and loads de-sdd-implement in the same chat.
 - 0.6.0: time and effort: `Intake started` header line from the first discovery query; per-task manual estimates confirmed with the task list.
 - 0.5.0: QA and gap-analysis fixes: deploy route asked when no serverless, file arrival plus schedule decision, decisions.md appended every round, project-prefixed memory notes, templates (profile runtime row, plan rollback matches release gate, pr_review vs release files, Touches field, hotfix unchanged-behaviour section, invariant acceptance checks).

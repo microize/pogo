@@ -80,3 +80,12 @@ Read before writing pipeline, SQL, bundle or job code. Routed from `AGENTS.md`; 
   dev the cluster stays up for the shutdown delay, so the real update right after reuses it.
 - Development-mode bundles prefix schema names they create; create shared dev schemas once with
   `CREATE SCHEMA IF NOT EXISTS` instead of bundle schema resources.
+
+## Learned in live tests (2026-11-12)
+
+- Read before you query: the first query on a table not yet described in this chat reads its columns
+  (`information_schema.columns` or `DESCRIBE`) in the same batch; do not guess column names (a guessed `run_ts` failed).
+- Files in a volume: `dbutils.fs.ls('/Volumes/...')` or the `LIST '/Volumes/...'` statement; `FROM LIST(...)` is not a
+  table function and fails on classic clusters.
+- Integer checksums over many rows overflow under ANSI mode (`sum(xxhash64(...))`); compare `count(*)` plus a
+  `sha2(concat_ws(...))` per row aggregated with `collect_list`/`sort_array`, or cast to `DECIMAL(38,0)` before `sum`.

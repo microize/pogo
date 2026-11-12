@@ -2,10 +2,15 @@
 name: de-sdd-implement
 description: Task-by-task implementation of an approved data engineering spec on Databricks. Use when the user says "implement", "next task", "work on T03", "run the approved plan", or replies "approved" after a spec exists. Claims and executes specs/<track_id>/tasks.md one task at a time with verification, records evidence in .internal_<email>/, logs struggles to .challenges_<email>/, and never changes the spec without the user's approval.
 metadata:
-  version: "0.8.0"
+  version: "0.8.1"
 ---
 
 # de-sdd-implement: claim one task, verify, tick, repeat
+
+> **Stop rule (read first).** After each task's verification you show its **Validate** block and **end your turn**.
+> Do not tick it, and do not claim, start or run anything for the next task in the same turn. The next task begins
+> only in a new turn, after the human replies `ok` (or has said `auto` earlier in this chat). This holds for every
+> track type, including small ones and tasks that took one step.
 
 ## Preconditions (every time you are loaded)
 
@@ -146,6 +151,7 @@ anything built that the spec did not request (each with its Decision Log row, or
 any spec-to-code gap as new tasks under "Review fixes" and wait for the user's go.
 
 ## Changelog
+- 0.8.1: stop rule at the top: the Validate block ends the turn (a live test ticked T01 and started T02 in the same turn without `ok`).
 - 0.8.0: live end-to-end test fixes: Validate block never skipped (count-only query and where to run it, never in a pipeline notebook); no row displays to check results; fixture files without overwrite.
 - 0.7.0: time and effort: Started / Verified / Ticked times from `current_timestamp()` folded into existing queries, Time per task row, track Timeline and closing time line.
 - 0.6.0: QA and gap-analysis fixes: cost-aware checks and batched questions, stop on policy / permission / quota rejection, uncommitted-work note before job runs, tick updates index.md, additive deviations are Minor amendments, update / run id as evidence, no fourth fix, optional table version before task, Done lists unmet and unrequested items, REVOKE in guardrails, write-audit-publish note.
