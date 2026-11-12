@@ -2,7 +2,7 @@
 name: de-data-governance
 description: Data governance assessment and proposals for Unity Catalog, for data stewards, governance leads and architects. Use when the user asks for a governance audit, scorecard or maturity check, "who owns this data", ownership or steward model, PII or sensitive data classification review, governed tag taxonomy, tag coverage, comment or documentation coverage, certification or deprecation candidates, ABAC policy proposals or "which sensitive columns are not protected", access hygiene review, CDMC or DAMA alignment, or "track governance over time". Reads information_schema and system tables (metadata and counts only), scores each asset against checks mapped to the EDM Council CDMC 14 key controls, and writes specs/governance/<scope>/assessment.md with findings, proposals and a human-run apply script. Advisory only: never runs GRANT, REVOKE, SET TAGS, COMMENT, CREATE POLICY or ownership changes itself.
 metadata:
-  version: "0.1.0"
+  version: "0.1.1"
 ---
 
 # de-data-governance: how well governed is this data, and what to fix first
@@ -74,7 +74,7 @@ State the mode in your first line.
    and 30-day usage (read events per table from `system.access.table_lineage`). SQL in
    `references/governance-checks.md`.
 4. **Score.** Run checks G01 to G22. Each asset gets a completeness score (weights in the checks file) and a band:
-   **Gold** at 90 or more, **Silver** at 75, **Bronze** at 50, **Ungoverned** below. Each CDMC component gets a
+   **Strong** at 90 or more, **Good** at 75, **Weak** at 50, **Ungoverned** below. Each CDMC component gets a
    maturity level from 0 to 5 (`references/frameworks.md`). Sensitive assets are scored on their own line, because
    CDMC applies its controls to sensitive data first.
 5. **Reconcile classification with protection.** Join `class.*` system tags and governed sensitivity tags with column
@@ -119,6 +119,7 @@ classification and no unprotected sensitive column. A table that fails is a WARN
   owner; this skill reads and reviews its results.
 
 ## Changelog
+- 0.1.1: score bands renamed Strong / Good / Weak / Ungoverned so they are not confused with bronze / silver / gold layers.
 - 0.1.0: initial: read-only Unity Catalog governance assessment with 22 checks mapped to the CDMC 14 key controls,
   completeness score and bands, maturity per CDMC component, classification-to-protection reconciliation, ABAC and
   governed-tag proposals, certification rubric, recognized-steward operating model, score history, human-run apply

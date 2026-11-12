@@ -54,7 +54,8 @@ report's "not measured" box.
 | 5 | G15 quality measured |
 
 Skipped checks are removed from the denominator (score = points / available points x 100) and the report says so.
-Bands: **Gold** 90 or more, **Silver** 75 to 89, **Bronze** 50 to 74, **Ungoverned** below 50. Catalog and schema
+Bands: **Strong** 90 or more, **Good** 75 to 89, **Weak** 50 to 74, **Ungoverned** below 50 (not named Gold / Silver /
+Bronze, so they are never confused with medallion layers). Catalog and schema
 scores are usage-weighted averages (weight = 1 + reads in 30 days, so unused tables count but do not dominate).
 Report the sensitive-asset score on its own line.
 
@@ -75,7 +76,7 @@ and usage (G11 to G13), Protection and privacy (G09, G10, G21), Data lifecycle (
 
 ## 4. Certification and deprecation rubric
 
-Propose `certified` only when **all** hold: band Gold; owner is a group; at least 95% of columns commented;
+Propose `certified` only when **all** hold: band Strong; owner is a group; at least 95% of columns commented;
 sensitivity reviewed (G08) and sensitive columns protected (G09); quality measured (G15) with no open Critical
 failure; lineage to source (G14); read in the last 30 days; a data contract exists when the table has consumers
 outside the owning team (`specs/contracts/`); a primary key where the grain is known. The owner sets it; the
