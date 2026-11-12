@@ -1,8 +1,8 @@
 ---
 name: de-run-diagnose
-description: Run, monitor, verify and debug Databricks pipelines and jobs in a bounded loop. Use when the user asks to run a pipeline or job and confirm it worked, or says "did my pipeline fail", "my job failed", "why did the run fail", "why is it slow", "the numbers look wrong", "repair the run", or a run failed, a Spark error or stack trace is pasted, a pipeline is slow or hanging, output tables look wrong, or PySpark code needs a performance review. Also Explain mode: "explain this log", "what does this stack trace mean", "read this Spark UI / stage / query profile / EXPLAIN plan", "why is this stage slow", in plain language with the line or metric that shows it. Classifies the failure, applies a fix, re-runs at most three times, then escalates, and logs every struggle to .challenges_<email>/. Dev target only unless told otherwise.
+description: Run, monitor, verify and debug Databricks pipelines and jobs in a bounded loop, and explain any Spark or Databricks error. Use when the user asks to run a pipeline or job and confirm it worked, or says "did my pipeline fail", "my job failed", "why did the run fail", "why is it slow", "the numbers look wrong", "repair the run", or a run failed, a Spark error or stack trace is pasted, a pipeline is slow or hanging, output tables look wrong, or PySpark code needs a performance review. Also Explain mode: "explain this log", "what does this stack trace mean", "read this Spark UI / stage / query profile / EXPLAIN plan", "why is this stage slow", in plain language with the line or metric that shows it. Load it for every pasted error, stack trace or log, even when the cause looks obvious (it labels the cause and names the fix id). Classifies the failure, applies a fix, re-runs at most three times, then escalates, and logs every struggle to .challenges_<email>/. Dev target only unless told otherwise.
 metadata:
-  version: "0.6.0"
+  version: "0.6.1"
 ---
 
 # de-run-diagnose: run, verify, fix, re-run, escalate
@@ -125,6 +125,7 @@ When asked to review PySpark or pipeline performance rather than a failure: scan
 finding, impact, fix, effort.
 
 ## Changelog
+- 0.6.1: description: every pasted error or stack trace triggers the skill (a live test explained UNRESOLVED_COLUMN without loading it).
 - 0.6.0: Explain mode with `references/reading-evidence.md` (where each piece of evidence lives per compute type, answer shape, stack traces, cluster event and termination codes, Spark UI decision steps from the Databricks guide, query profile insights, query history signals, plan reading with AQE, pipeline event log metrics); hand-offs to de-spark-runtime for compute and version advice.
 - 0.5.0: QA and gap-analysis fixes: job monitoring through the Python SDK (no CLI), repair_run recipe with
   idempotency check, plain-language triggers, "Tier 1" reworded in fix recipes, anti-pattern catalog defers to the

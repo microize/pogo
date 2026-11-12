@@ -2,7 +2,7 @@
 name: de-env-check
 description: Workspace readiness check for Databricks data engineering, per environment (dev / staging / prod) and per team. Use when starting a new project or track, when the user says "check the environment", "workspace readiness", "what compute do I have", "can I run pipelines here", "prerequisites", "onboard this workspace", "is prod ready", or when a run fails for an environment reason (no compute, quota exceeded, waiting for resources, insufficient privileges, catalog cannot be created). Read-only probe of compute, quota signals, Unity Catalog, system tables and tooling; writes the environment index in specs/project-profile.md and specs/env/<env>-<team>.md with an admin checklist. Never changes settings, grants or clusters.
 metadata:
-  version: "0.4.0"
+  version: "0.4.1"
 ---
 
 # de-env-check: know what this workspace can run before designing
@@ -38,6 +38,12 @@ clusters, warehouses, policies and quota share. So:
 - **Counts and settings only.** No row values from data tables.
 - Stop at the first missing prerequisite that blocks the user's goal and say what is needed (see `de-sdd-implement`,
   "Missing prerequisite").
+- **Workspace-only alternatives.** Never suggest the `databricks` CLI, a laptop or CI as a workaround: the method runs
+  inside the workspace. No Deployments panel (no serverless) means: the agent creates **dev** jobs and pipelines with
+  the Python SDK / Jobs API on allowed classic compute, or an admin enables serverless; non-dev deploys stay user-run.
+- **Run SQL where Unity Catalog works.** A cluster in access mode `NONE` (no isolation) cannot read Unity Catalog
+  (`UC_NOT_ENABLED`). Use the compute the user names; otherwise a Unity Catalog-capable one (Dedicated or Standard
+  cluster, or the team's warehouse), and say which.
 
 ## Procedure
 
@@ -75,6 +81,9 @@ signatures"), re-run only the affected checks, update the Environment section, a
 and log a challenge through `de-sdd-tracking`.
 
 ## Changelog
+- 0.4.1: live test fixes: never suggest the CLI as a workaround (it advised "use the command-line tool" when the
+  Deployments panel needs serverless); run SQL on Unity Catalog-capable compute (`UC_NOT_ENABLED` on a no-isolation
+  cluster).
 - 0.4.0: QA and gap-analysis fixes: no serverless is Blocking for the Deployments-panel route (alternatives recorded),
   cluster policies and single-node, design-changing previews, owners from the creator field, shallow clone for dev data.
 - 0.3.0: workspace-only: Pipelines Editor, SDK, Git folder UI and bundle Deployments panel replace local CLI and CI steps.

@@ -1,8 +1,8 @@
 ---
 name: de-data-governance
-description: Data governance assessment and proposals for Unity Catalog, for data stewards, governance leads and architects. Use when the user asks for a governance audit, scorecard or maturity check, "who owns this data", ownership or steward model, PII or sensitive data classification review, governed tag taxonomy, tag coverage, comment or documentation coverage, certification or deprecation candidates, ABAC policy proposals or "which sensitive columns are not protected", access hygiene review, CDMC or DAMA alignment, or "track governance over time". Reads information_schema and system tables (metadata and counts only), scores each asset against checks mapped to the EDM Council CDMC 14 key controls, and writes specs/governance/<scope>/assessment.md with findings, proposals and a human-run apply script. Advisory only: never runs GRANT, REVOKE, SET TAGS, COMMENT, CREATE POLICY or ownership changes itself.
+description: Data governance assessment and proposals for Unity Catalog (stewards, governance leads, architects). Use for a governance audit or quick check, scorecard or maturity, "which tables have no description or owner", "which sensitive columns have no mask or tag", PII classification review, ownership or steward model, governed tag taxonomy, tag or comment coverage, certification or deprecation candidates, ABAC policy proposals, access hygiene, CDMC or DAMA alignment, or governance over time. Load it even for one quick question about a catalog. Reads information_schema and system tables (metadata and counts only), scores assets against checks mapped to the EDM Council CDMC 14 key controls, and writes specs/governance/<scope>/assessment.md with findings, proposals and a human-run apply script. Advisory only: never runs GRANT, REVOKE, SET TAGS, COMMENT, CREATE POLICY or ownership changes itself.
 metadata:
-  version: "0.1.1"
+  version: "0.1.2"
 ---
 
 # de-data-governance: how well governed is this data, and what to fix first
@@ -119,6 +119,7 @@ classification and no unprotected sensitive column. A table that fails is a WARN
   owner; this skill reads and reviews its results.
 
 ## Changelog
+- 0.1.2: description: plain questions ("which tables have no description", "sensitive columns with no mask or tag", "quick governance check") now trigger the skill; a live test answered them without it.
 - 0.1.1: score bands renamed Strong / Good / Weak / Ungoverned so they are not confused with bronze / silver / gold layers.
 - 0.1.0: initial: read-only Unity Catalog governance assessment with 22 checks mapped to the CDMC 14 key controls,
   completeness score and bands, maturity per CDMC component, classification-to-protection reconciliation, ABAC and

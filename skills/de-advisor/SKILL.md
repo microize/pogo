@@ -1,8 +1,8 @@
 ---
 name: de-advisor
-description: Advisor mode for Databricks data engineering. Use when the user says "advise", "advisor mode", "should we use X or Y", "what is the best way", "best fit", "what should we upgrade", "review this design", or asks for a technology / architecture recommendation (ingestion, pipelines, SCD/CDC, serving, orchestration, compute, cost). Recommends the best fit for the requirement in the team's actual environment (de-env-check record), checks current feature availability and maturity, says which upgrade or enablement would help and what it buys, and balances cost against run time with de-cost. Read-only; writes nothing except an accepted decision record under specs/decisions/ and the person's own ledger rows.
+description: Chooses between Databricks services, features or designs for a data engineering need and recommends one for this team's workspace. Use for any "A or B" or "which / best way" question, for example "Auto Loader or Lakeflow Connect", "pipeline or notebook job", "streaming table or materialized view", "SCD 1 or 2", "AUTO CDC or MERGE", "Delta or Iceberg", "warehouse or pipeline for this", "what is the best way to load / serve / orchestrate X", "review this architecture or design", "what should we upgrade or enable", "advise", "advisor mode". Load it even when the answer seems obvious: it checks the team's environment record (de-env-check), current feature maturity (GA vs Preview) and cost against run time (de-cost) before recommending. Read-only; writes only an accepted decision record under specs/decisions/ and the person's own ledger rows. Not for prices alone (de-cost) or cluster size and runtime version (de-spark-runtime).
 metadata:
-  version: "0.5.1"
+  version: "0.5.2"
 ---
 
 # de-advisor: best fit for this requirement, in this environment, at this cost
@@ -60,6 +60,7 @@ Direct. One recommendation. Numbers and names, not adjectives. Say "I do not kno
 needed and are not reachable, and name the page to check.
 
 ## Changelog
+- 0.5.2: description rewritten after a live test where "Auto Loader or Lakeflow Connect?" was answered without loading the skill: concrete A-or-B examples, "load it even when the answer seems obvious", and the not-for list.
 - 0.5.1: logs a worklog row (time and manual estimate) per piece of advice.
 - 0.5.0: workspace-only: Pipelines Editor, SDK, Git folder UI and bundle Deployments panel replace local CLI and CI steps.
 - 0.4.0: environment-aware (de-env-check records), feature availability check, upgrade advice with admin step and effect, cost and run-time balance through de-cost.

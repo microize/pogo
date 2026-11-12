@@ -2,7 +2,7 @@
 name: de-ontology-design
 description: Ontology and knowledge-graph design from data already in Databricks, for data modelers and architects. Use when the user asks which concepts, entities, properties or relationships the data supports, to design or review an ontology or concept model, to prepare data for a knowledge graph or GraphRAG, or for glossary terms from tables. Produces specs/ontology/<domain>/ontology.md (concepts, properties, relationships, vocabularies, identity, competency-question coverage, each with evidence) from Unity Catalog metadata and counts-only profiles; optional OWL or LinkML text. Advisory only: never builds graph tables, loads a graph database or changes data.
 metadata:
-  version: "0.1.1"
+  version: "0.1.2"
 ---
 
 # de-ontology-design: what concepts our data can support
@@ -18,9 +18,11 @@ Rules for turning tables and columns into concepts: `references/derivation-rules
 ## Ground rules
 
 - **Read-only.** Metadata from `information_schema` and Unity Catalog; profiles are counts only (`count`,
-  `count(DISTINCT ...)`, null counts, overlap counts). Never select row values (one exception: labels of a code or lookup table the owner confirms is non-sensitive reference data); never print PII. Batch the profile
-  into as few queries as possible (one per schema where you can) and use the SQL warehouse, not the notebook's
-  cluster.
+  `count(DISTINCT ...)`, null counts, overlap counts). Never select row values (one exception: labels of a code or lookup table the owner confirms is non-sensitive reference data); never print PII. Batch the profile:
+  **at most three approvals per run** (one inventory, one profile, one overlap / cardinality pass), each a single
+  Python cell that runs all its `spark.sql` reads and prints one summary, never one query per table. Run on the compute
+  the user names; otherwise a Unity Catalog-capable one (the team's SQL warehouse, or a Dedicated / Standard cluster),
+  never a no-isolation cluster (`UC_NOT_ENABLED`).
 - **Evidence on every item.** Each concept, property and relationship is marked **declared** (PK/FK constraint,
   governed tag, comment, metric view, existing contract), **inferred** (name and count evidence, with the numbers) or
   **assumed** (your proposal, needs a business owner). Never present inferred or assumed items as facts.
@@ -89,6 +91,7 @@ profile, and competency questions it cannot answer. Findings as Blocker / Major 
 - Schema change impact on consumers: `de-data-contract`. Rules that validate data: `de-quality-testing`.
 
 ## Changelog
+- 0.1.2: live test fixes: profiling sent about 12 separate queries (12 approvals); now at most three batched cells. Compute: the one the user names, else a Unity Catalog-capable one.
 - 0.1.1: status of Domains, Pages and Genie Ontology updated; sensitivity from de-data-governance tags.
 - 0.1.0: initial: concepts, properties, relationships, vocabularies, hierarchies and identity proposed from Unity
   Catalog metadata and counts-only profiles, with evidence levels and competency-question coverage; optional OWL or

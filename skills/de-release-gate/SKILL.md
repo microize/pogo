@@ -2,7 +2,7 @@
 name: de-release-gate
 description: Two gates for Databricks data engineering changes. PR gate: review a diff for anti-patterns, breaking schema changes, missing tests and DQ checks, hard-coded values, secrets, and docs, and give a merge disposition (APPROVE / REQUEST_CHANGES / BLOCK). Prod gate: pre-production readiness scorecard (bundle targets, run-as identity, compute, secrets, grants, DQ gates, SLA, rollback, operations) with a GO / CONDITIONAL_GO / NO_GO verdict. Use before merging or before deploying to prod. Read-only; never deploys.
 metadata:
-  version: "0.6.1"
+  version: "0.6.2"
 ---
 
 # de-release-gate: merge gate and prod gate
@@ -31,6 +31,9 @@ This gate only checks that they were applied, by reading `databricks.yml` and `r
 SQL and SDK reads. Genie Code has no CLI: a bundle is validated when a human deploys it from the bundle **Deployments
 panel** (rocket icon on `databricks.yml` in a Git folder; Public Preview), and the panel deploys only to targets in the
 workspace it runs in, so the prod deploy happens from a Git folder in the **prod** workspace.
+When a workspace has no serverless (no Deployments panel), never name the `databricks` CLI, a laptop or CI as the
+fix: the routes are an admin enabling serverless in that workspace, or jobs created with the Python SDK / Jobs API by
+a person in that workspace and recorded as API-managed.
 
 | Area | Checks |
 |---|---|
@@ -70,6 +73,7 @@ verification. Then re-run the prod gate when the track is done.
 Severity scale: findings are Blocker / Major / Minor; checks are PASS / WARN / FAIL (WARN counts as Major).
 
 ## Changelog
+- 0.6.2: live test fix: a NO_GO blocker suggested "the CLI" as a deploy route; now names only workspace routes (serverless, or SDK / Jobs API jobs recorded as API-managed).
 - 0.6.1: prod gate Governance row reads the de-data-governance assessment for the released tables.
 - 0.6.0: PR rules for re-run behaviour and row-multiplying joins; run-health baseline in the Observability row; tested personal data erasure procedure in the Governance row; semantic and Genie readiness row.
 - 0.5.0: QA and gap-analysis fixes: full-refresh protection row (`pipelines.reset.allowed=false`), uncommitted Git folder code is a finding, API-created jobs recorded as API-managed.
